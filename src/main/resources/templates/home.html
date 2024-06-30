@@ -27,19 +27,19 @@
                     <div class="item">
                         <img class="d-block w-100 lazyload"
                              th:src="@{/static/img/placeholder.png}"
-                             data-src="https://image.tmdb.org/t/p/original/cmgjr2saprHvYw6Ee7MUIqGVQHn.jpg"
+                             th:data-src="@{/static/img/chào bạn mới.png}"
                              alt="Movie Poster 2">
                     </div>
                     <div class="item">
                         <img class="d-block w-100 lazyload"
                              th:src="@{/static/img/placeholder.png}"
-                             data-src="https://image.tmdb.org/t/p/original/SI22DaQXIfDvLrNBHGpSVShrsC.jpg"
+                             th:data-src="@{/static/img/minion.png}"
                              alt="Movie Poster 3">
                     </div>
                     <div class="item">
                         <img class="d-block w-100 lazyload"
                              th:src="@{/static/img/placeholder.png}"
-                             data-src="https://image.tmdb.org/t/p/original/xg27NrXi7VXCGUr7MG75UqLl6Vg.jpg"
+                             th:data-src="@{/static/img/insideout-2.png}"
                              alt="Movie Poster 4">
                     </div>
                     <div class="item">
@@ -112,9 +112,7 @@
                         </div>
                     </div>
                 </div>
-                <button id="btn-more">
-                    <a th:href="@{/now-playing}">Xem thêm</a>
-                </button>
+                <button th:href="@{/now-playing}" id="btn-more">Xem thêm</button>
                 <hr>
             </div>
 
