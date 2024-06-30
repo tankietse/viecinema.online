@@ -1,0 +1,51 @@
+body {
+    background-color: #F6F6F6;
+}
+.sidebar {
+    background: linear-gradient(100deg, #9181F4 -5.85%, #5038ED 109.55%);
+    height: 100vh;
+    padding-top: 20px;
+    overflow-y: auto; 
+    width: 300px; 
+}
+.sidebar h2 {
+    color: white;
+    text-align: center; 
+    margin-bottom: 30px; 
+}
+.sidebar a {
+    color: white;
+    padding: 15px;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    padding-left: 20px; 
+}
+.sidebar a .arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease; 
+}
+.sidebar a:hover {
+    background-color: #495b8d;
+}
+.sidebar .arrow {
+    transform: rotate(0deg); 
+}
+.sidebar a[aria-expanded="true"] .arrow {
+    transform: rotate(180deg); 
+}
+.sidebar .collapse {
+    padding-left: 20px; 
+}
+.content {
+    padding: 20px;
+}
+.card {
+    margin-bottom: 20px;
+}
+.collapse-item {
+    padding-left: 40px; 
+}

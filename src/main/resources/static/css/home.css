@@ -1,0 +1,701 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto";
+}
+
+body, html {
+  min-width: 390px;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #F6F6F6;
+}
+
+/* Đối với Chrome, Edge và Safari */
+::-webkit-scrollbar {
+  width: 8px; /* Độ rộng của thanh scrollbar */
+  height: 8px; /* Độ cao của thanh scrollbar ngang */
+  border-radius: 10px; /* Bo tròn góc của thanh kéo */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Màu nền của đường dẫn scrollbar */
+  border-radius: 10px; /* Bo tròn góc của đường dẫn */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Màu của thanh kéo scrollbar */
+  border-radius: 10px; /* Bo tròn góc của thanh kéo */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Màu của thanh kéo khi hover */
+}
+
+
+/* Đối với Internet Explorer 10+ và Microsoft Edge */
+body {
+  -ms-overflow-style: none; /* Ẩn scrollbar mặc định */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Ẩn scrollbar mặc định */
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 60px;
+    background-color: #fff;
+  }
+
+  .logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .logo .vie-cinema {
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(to right, #e586ff, #ff6584);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .nav-list {
+    display: flex;
+  }
+
+  .nav-item {
+    list-style: none;
+    margin: 0 10px;
+    position: relative;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+    padding-bottom: 25px;
+    transition: color 0.3s ease;
+  }
+
+  .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgb(201, 201, 201);
+      border-radius: 8px;
+      z-index: 1;
+      padding: 10px 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0;
+      white-space: nowrap;
+      padding-right: 50px;
+    }
+
+  .dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(20px);
+  }
+
+  .dropdown-item {
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    color: black;
+    transition: background-color 0.3s ease;
+    min-width: 150px;
+  }
+
+  .dropdown-item:hover,
+  .nav-link:hover {
+    color: #ff6584;
+    font-weight: 400;
+    transition: 0.3s;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .ticket-link {
+    display: block;
+    margin-right: 20px;
+  }
+
+  .ticket-image {
+    width: 149px;
+    height: 48px;
+  }
+
+  .search-box {
+    margin-right: 20px;
+  }
+
+  .search-icon {
+    font-size: 20px;
+    color: #777;
+    cursor: pointer;
+  }
+
+  .login-btn {
+    width: 130px;
+    height: 37px;
+    background-color: #ff6584;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 20px;
+    border: none;
+  }
+
+  .account-btn img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  .menu-toggle {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    padding: 20px;
+  }
+
+  .mobile-nav.open {
+    display: block;
+  }
+
+  .mobile-nav ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .mobile-nav ul li {
+    margin: 20px 0;
+  }
+
+  .mobile-nav ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+  }
+
+  .container{
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .container ::content{
+    display: flex;
+  }
+
+/* Footer */
+.footer {
+    width: 100%;
+    max-height: 517px;
+    background-color: #333333;
+    padding: 50px 70px;
+    color: white;
+}
+
+.row{
+  display: flex;
+  justify-content: space-around;
+}
+.row div h4{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.row div ul li{
+  list-style: none;
+  cursor: pointer;
+
+}
+.Footer_footer_bottom_content{
+  align-self: center;
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* CSS Slider */
+.slider{
+    width: 1200px;
+    max-width: 100vw;
+    height: 400px;
+    margin: auto;
+    top: 0px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .list{
+    position:absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    display: flex;
+    width: max-content;
+    transition: 1.2s;
+  }
+  .item{
+    border-radius: 18px;
+    margin: 0 10px;
+    overflow: hidden;
+  }
+
+  .list img{
+    width: 1200px;
+    max-width: 100vw;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .buttons{
+    position: absolute;
+    top: 45%;
+    left: 5%;
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .buttons button{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #fff9;
+    color: #fff;
+    border: none;
+    font-family: monospace;
+    font-weight: bold;
+  }
+
+  .dots{
+    position: relative;
+    top: 360px;
+    color: #ffffffc4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dots li{
+    list-style: none;
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 1s;
+  }
+
+  .dots li.active{
+    width: 40px;
+  }
+  /* Content */
+.top-content,
+.middle-content,
+.bottom-content,
+#introduction div{
+  display: flex;
+  padding: 40px 0 20px 0;
+  margin: auto;
+  width: 1500px;
+  padding-bottom: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 27px;
+}
+.task-list{
+  font-size: 20px;
+  margin: auto;
+  font-style: normal;
+  line-height: normal;
+  display: flex;
+}
+
+.task-list li{
+  list-style: none;
+  display: inline-block;
+  position: relative;
+  margin-right: 50px;
+  cursor: pointer;
+}
+.task-list li:hover{
+  /* color: #0029FF; */
+  transition: 0.3s;
+}
+
+/* Underline effect */
+.task-list li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background-color: #ff6584;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.4s;
+}
+
+.task-list li:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.page-active{
+  color: #FB3885;
+  font-weight: 700;
+}
+#cinema-corner{
+  color: #0029FF;
+  font-weight: 500;
+}
+
+.middle-content{
+  max-width: 1500px;
+  min-height: 1200px;
+  gap: 30px;
+}
+.card-row{
+  width: 100%;
+  max-height: 580px;
+  display: flex;
+  padding: 20px 10px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.movie-cards {
+  width: 320px;
+  height: 529px;
+  overflow: hidden;
+  display: grid;
+  position: relative;
+}
+
+.movie-cards .card-item {
+  width: 100%;
+  height: 480px; /* Chiều cao của toàn bộ thẻ */
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+img.lazyload {
+  opacity: 0;
+  transition: opacity 1000ms;
+}
+
+img.lazyloaded {
+  transition: 1s;
+  opacity: 1;
+}
+.movie-cards .card-item img {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
+.movie-cards:hover .card-item img {
+  transform: scale(1.1);
+}
+
+.movie-cards .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 480px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.movie-cards .overlay .card-buttons {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  gap: 10px;
+}
+
+.movie-cards .overlay .card-buttons a {
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  text-align: center;
+  transition: 0.5s;
+}
+
+.buy-ticket{
+  background: #FB3885;
+}
+.card-buttons:hover .watch-trailer {
+  background: #f1812f;
+}
+
+.movie-cards:hover .overlay {
+  opacity: 1;
+}
+
+
+
+.movie-title{
+  margin: 20px;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.middle-content hr{
+  border-top: 1px solid #F0EDFF;
+  width: 1000px;
+  align-self: center;
+}
+
+#btn-more{
+  position: relative;
+  width: 200px;
+  height: 60px;
+  align-self: center;
+  font-size: 18px;
+  color: #f1812f;
+  border-radius:  5px;
+  border: 2px solid #f1812f;
+  background-color: #fff;
+}
+
+#btn-more:hover{
+  color:#ffffff;
+  background-color: #f1812f;
+  transition: 0.5s;
+}
+/* Modal styles*/
+.modal ,
+.cookie-law-info-bar{
+  display: none;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: fixed;
+}
+
+.modal{
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(0, 0, 0);
+}
+
+.cookie-law-info-bar{
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: end;
+}
+
+.modal-content {
+  text-align: center;
+  color: white;
+}
+
+#videoFrame{
+  width: 90%;
+  height: 98vh;
+}
+
+.close {
+  color: rgb(203, 203, 203);
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cookies-content{
+  display: flex;
+  width: 300px;
+  height: 360px;
+  padding: 20px;
+  margin: 20px;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.24), 0 3px 0px 0 rgba(0,0,0,0.19);
+  border-radius: 8px;
+  color: #000;
+  background-color: #FFF;
+}
+.cookies-content div{
+  width: 247px;
+  height: 275px;
+  flex-shrink: 0;
+}
+.cookies-content div h4{
+  max-width: 80%;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 450;
+}
+.cookies-content div p{
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 300;
+  margin-top: 10px;
+}
+
+.cookies-buttons{
+  display: flex;
+  width: 265px;
+  height: 46px;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+#declineCookies{
+  width: 144px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 30px;
+  border: 1px solid #000;
+  color: #4378FF;
+  text-align: center;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  background-color: #FFF;
+}
+
+#acceptCookies{
+  width: 109px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 30px;
+  color: #FFF;
+  font-weight: 500;
+  background: linear-gradient(100deg, #4378FF -5.85%, #5038ED 109.55%);
+}
+/* Blogs */
+.bottom-content{
+  max-width: 1500px;
+  max-height: 650px;
+  margin-bottom: 20px;
+}
+
+.blog-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Main Blog */
+ .main-blog {
+  width: 50%;
+  gap: 20px;
+}
+.main-blog:hover ,
+.small-blog:hover{
+  transition: 0.5s;
+  transform: scale(1.02);
+}
+
+.main-blog img {
+  width: 721px;
+  height: 481px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.small-blogs {
+  width: 50%;
+}
+
+.small-blog {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.small-blog {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+.small-blog img {
+  width: 200px;
+  height: 130px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.blog-content a{
+    color: inherit;
+    text-decoration: none;
+}
+
+#introduction{
+  background: #ffffff;
+  width: 100vw;
+  height: 352px;
+  flex-shrink: 0;
+}
+#introduction div h2
+{
+  color: #000000;
+  font-size: 24px;
+  font-weight: 400;
+}

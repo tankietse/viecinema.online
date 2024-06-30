@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vie Cinema: Hệ Thống Rạp Chiếu Phim Hại Điện</title>
+    <<link rel="icon" type="image/svg" th:href="@{/static/img/Vie.png}"/>
+    <link rel="stylesheet" th:href="@{/static/css/home.css}">
+    <!-- Font -->
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.0/lazysizes.min.js" async></script>
+</head>
+<body>
+<header class="header">
+    <div class="logo">
+        <a href="/home" class="pointer-event underline-none">
+            <div class="vie-cinema">VieCinema</div>
+        </a>
+    </div>
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="#">Phim mới</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Góc điện ảnh</a>
+                    <a class="dropdown-item" href="#">Bình luận phim</a>
+                    <a class="dropdown-item" href="#">Blog điện ảnh</a>
+                    <a class="dropdown-item" href="#">Phim hay tháng</a>
+                    <a class="dropdown-item" href="#">Phim IMAX</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="#">Góc điện ảnh</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Thể loại phim</a>
+                    <a class="dropdown-item" href="#">Bình luận phim</a>
+                    <a class="dropdown-item" href="#">Blog điện ảnh</a>
+                    <a class="dropdown-item" href="#">Phim hay tháng</a>
+                    <a class="dropdown-item" href="#">Phim IMAX</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="#">Sự kiện</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Ưu đãi</a>
+                    <a class="dropdown-item" href="#">Phim hay tháng</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="header-right">
+        <a class="ticket-link" href="#">
+            <img alt="Ticket" class="ticket-image" th:src="@{static/img/mua-v.png">
+        </a>
+        <div class="search-box">
+            <a class="search-icon" title="Tìm kiếm">
+                <i class="fas fa-search"></i>
+            </a>
+        </div>
+        <button class="login-btn">Login</button>
+        <div class="account-btn">
+            <img th:src="@{static/img/user-profile 1.png}" alt="User Profile">
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</header>
+<div class="overlay" onclick="closeMenu()"></div>
+    <nav class="mobile-nav">
+        <ul>
+            <li><a href="#">Phim mới</a></li>
+            <li><a href="#">Góc điện ảnh</a></li>
+            <li><a href="#">Sự kiện</a></li>
+            <li><a href="#">Login</a></li>
+        </ul>
+    </nav>
+<main  layout:fragment="content">
+        <!-- Content sẽ được thay thế -->
+</main >
+<footer class="footer flexCenter">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 flex flex-column gap-4 mb-4">
+            <h4 class="title4-dart fw-bold w-100">
+                Liên hệ
+            </h4>
+            <h4 class="title4-dart w-100 text-uppercase">
+                CÔNG TY CỔ PHẦN PHIM VIECINEMA
+            </h4>
+            <div class="d-flex flex-row gap-5 w-100">
+                <ul class="pt-2">
+                    <li class="py-2">Email:</li>
+                    <li class="py-2">Hotline:</li>
+                    <li class="py-2">Trụ sở TP.HCM:</li>
+                    <li class="py-2">Trụ sở Hà Nội:</li>
+                </ul>
+                <ul class="pt-2">
+                    <li class="py-2">contact@viecinema.vn</li>
+                    <li class="py-2">0123456789</li>
+                    <li class="py-2">ABC, XYZ, khu CNC, TP. Thủ Đức, TP. HCM</li>
+                    <li class="py-2">ABC, XYZ...</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-1 col-sm-6 flex flex-column gap-2 mb-4">
+            <h4 class="title4-dart fw-bold w-100 text-uppercase">
+                GIỚI THIỆU
+            </h4>
+            <ul class="pt-2">
+                <li class="py-2">Về chúng tôi</li>
+                <li class="py-2">Thỏa thuận sử dụng</li>
+            </ul>
+        </div>
+        <div class="col-lg-1 col-sm-6 mb-4">
+            <h4 class="title4-dart fw-bold w-100 text-uppercase">
+                GÓC ĐIỆN ẢNH
+            </h4>
+            <ul class="pt-2">
+                <li class="py-2">Thể loại phim</li>
+                <li class="py-2">Bình luận phim</li>
+                <li class="py-2">Blog điện ảnh</li>
+                <li class="py-2">Phim hay tháng</li>
+                <li class="py-2">Phim IMAX</li>
+            </ul>
+        </div>
+        <div class="col-lg-2 col-sm-6 mb-4">
+            <h4 class="title4-dart fw-bold w-100 text-uppercase">
+                HỖ TRỢ
+            </h4>
+            <ul class="pt-2">
+                <li class="py-2">Developers</li>
+                <li class="py-2">Facebook</li>
+                <li class="py-2">Linkedin</li>
+                <li class="py-2">Youtube</li>
+                <li class="py-2">Zalo</li>
+            </ul>
+        </div>
+    </div>
+    <h4 class="Footer_footer_bottom_content">VIECINEMA 2024 © All Rights Reserved</h4>
+</footer>
+
+<!-- Bootstrap JS links -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" async></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" async></script> -->
+<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-beta1/js/bootstrap.min.js" async></script> -->
+</body>
+</html>
