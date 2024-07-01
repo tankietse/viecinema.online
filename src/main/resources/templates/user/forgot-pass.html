@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập tài khoản của bạn</title>
+    <link rel="icon" type="image/svg+xml"  th:href="@{/static/img/Vie.svg}" />
+    <link rel="stylesheet" type="text/css"  th:href="@{/static/css/login.css}">
+</head>
+<body>
+<section class="app">
+    <div class="container" style="height: 65%;">
+        <div class="login-form">
+            <h1>Quên mật khẩu</h1>
+
+            <form  action="/login" method="POST">
+                <!-- <div  if="param.error">
+                    <p class="error-message">Tên đăng nhập hoặc mật khẩu không đúng.</p>
+                </div> -->
+                <div style="position: relative; width: 100%;">
+                    <input type="text" id="username" name="username" placeholder="Email" autocomplete="username" required>
+                    <!-- <img id="toggle-password"  src="/img/user-profile 1.png" class="position-absolute top-50 start-100 translate-middle">                     -->
+                </div> 
+                <button type="submit" class="btn-login" style="width: 100%;">Cấp lại mật khẩu</button>
+            </form>
+
+            <div class="login-with-others">
+                <hr>
+                <p><strong>Đăng nhập bằng</strong> phương thức khác:</p>
+                <a class="google-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static/img/google-logo.png}" alt="Google">
+                    <span>Tiếp tục với Google</span>
+                </a>
+                <br>
+                <a class="facebook-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static/img/facebook-logo.png}" alt="Facebook">
+                    <span>Tiếp tục với  Facebook</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
