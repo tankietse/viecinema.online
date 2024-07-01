@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập tài khoản của bạn</title>
@@ -12,26 +13,26 @@
         <div class="login-form">
             <h1>Đăng nhập</h1>
 
-            <form  action="/login" method="POST">
+            <form  th:action="@{/login}" method="POST">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div th:if="${param.error}" class="alert alert-danger">
                     <p class="error-message">Tên đăng nhập hoặc mật khẩu không đúng.</p>
                 </div>
                 <div style="position: relative; width: 100%;">
                     <label for="username"></label>
-                    <input type="text" id="username" name="username" placeholder="   Tên người dùng" autocomplete="username" required>
+                    <input type="text" id="username" name="username" placeholder="Tên người dùng" autocomplete="username" required>
                     <img  th:src="@{/static/img/user-profile 1.png}"
                           class="position-absolute top-50 start-100 translate-middle toggle-password"
-                          style="cursor: default; position: absolute; top: 22px; right: 13px; transform: translateY(-50%); width: 17px;" alt="">
+                          alt="">
                 </div>
 
                 <br>
                 <div style="position: relative; width: 100%;">
                     <label for="password"></label>
-                    <input type="password" id="password" name="password" placeholder="   Mật khẩu" style="width: 100%;" autocomplete="current-password" required>
+                    <input type="password" id="password" name="password" placeholder="Mật khẩu" style="width: 100%;" autocomplete="current-password" required>
                     <img th:src="@{/static/img/eye-password-hide.svg}"
                          class="position-absolute top-50 start-100 translate-middle toggle-password"
-                         style="cursor: default; position: absolute; top: 22px; right: 13px; transform: translateY(-50%); width: 17px;" alt="">
+                         alt="">
                 </div>
 
                 <button type="submit" class="btn-login">Đăng nhập</button>
@@ -51,7 +52,9 @@
                 </a>
             </div>
         </div>
-        <span id="forgotpass">Quên mật khẩu?</span>
+        <a th:href="@{/forgot-pass}">
+            <span id="forgotpass">Quên mật khẩu?</span>
+        </a>
     </div>
 </section>
 </body>

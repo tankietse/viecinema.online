@@ -16,56 +16,11 @@
 <!-- Include layout -->
 <section layout:fragment="content">
     <div class="container custom-scrollbar">
-        <div class="slider">
-            <div class="list">
-                <div class="item">
-                    <img class="d-block w-100 lazyload"
-                         th:src="@{/static/img/placeholder.png}"
-                         data-src="https://image.tmdb.org/t/p/original/vblTCXOWUQGSc837vgbhDRi4HSc.jpg"
-                         alt="Movie Poster 1">
-                </div>
-                <div class="item">
-                    <img class="d-block w-100 lazyload"
-                         th:src="@{/static/img/placeholder.png}"
-                         data-src="https://image.tmdb.org/t/p/original/cmgjr2saprHvYw6Ee7MUIqGVQHn.jpg"
-                         alt="Movie Poster 2">
-                </div>
-                <div class="item">
-                    <img class="d-block w-100 lazyload"
-                         th:src="@{/static/img/placeholder.png}"
-                         data-src="https://image.tmdb.org/t/p/original/SI22DaQXIfDvLrNBHGpSVShrsC.jpg"
-                         alt="Movie Poster 3">
-                </div>
-                <div class="item">
-                    <img class="d-block w-100 lazyload"
-                         th:src="@{/static/img/placeholder.png}"
-                         data-src="https://image.tmdb.org/t/p/original/xg27NrXi7VXCGUr7MG75UqLl6Vg.jpg"
-                         alt="Movie Poster 4">
-                </div>
-                <div class="item">
-                    <img class="d-block w-100 lazyload"
-                         th:src="@{/static/img/placeholder.png}"
-                         data-src="https://image.tmdb.org/t/p/original/fDmci71SMkfZM8RnCuXJVDPaSdE.jpg"
-                         alt="Movie Poster 5">
-                </div>
-            </div>
-            <div class="buttons">
-                <button id="prev"><</button>
-                <button id="next">></button>
-            </div>
-            <ul class="dots">
-                <li></li>
-                <li class="active"></li>
-                <li></li>
-                <li></li>
-                <li></li>
-            </ul>
-        </div>
         <div class="top-content">
             <div>
                 <ul class="task-list">
-                    <li id="new-movie" class="page-active" th:th:data-url="@{/home}">Phim</li>
-                    <li id="now-playing" th:th:data-url="@{/now-playing}">Đang chiếu</li>
+                    <li id="new-movie"  th:th:data-url="@{/home}">Phim</li>
+                    <li id="now-playing" class="page-active" th:th:data-url="@{/now-playing}">Đang chiếu</li>
                     <li id="coming-soon" th:data-url="@{/coming-soon}">Sắp chiếu</li>
                     <li id="IMAX" >IMAX</li>
                 </ul>
@@ -76,13 +31,13 @@
                 <div class="card-row">
                     <div th:each="movie : ${nowPlayingMovies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, nowPlayingMovies.size()))}" class="movie-cards">
                         <div class="card-item">
-                            <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${nowPlayingMovies.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
+                            <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
                         </div>
                         <span class="movie-title" th:text="${movie.title}"></span>
                         <div class="overlay">
                             <div class="card-buttons">
                                 <a href="#" class="buy-ticket">Mua vé</a>
-                                <a href="#" class="watch-trailer" th:data-video-id="${nowPlayingMovies.videoId}">Xem trailer</a>
+                                <a href="#" class="watch-trailer" th:data-video-id="${movie.videoId}">Xem trailer</a>
                             </div>
                         </div>
                     </div>
@@ -115,54 +70,7 @@
             <button id="btn-more">Xem thêm</button>
             <hr>
         </div>
-    <div class="bottom-content">
-        <div>
-            <ul class="task-list">
-                <li id="cinema-corner"><b>Góc điện ảnh</b></li>
-                <li id="movie-commentary">Bình luận phim</li>
-                <li id="blogs">Blog điện ảnh</li>
-            </ul>
-        </div>
-        <div class="blog-container">
-            <div class="main-blog">
-                <!-- <button class="play-button" class="watch-trailer" data-video-id="9phK0prtuJM">
-                  <i class="play-icon"></i> </button>
-                </button> -->
-                <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="movie-name">
-                <h3 hrel="#">Inside Out 2: Thảm họa cảm xúc tuổi dậy thì</h3>
-            </div>
-            <div class="small-blogs">
-                <div class="small-blog">
-                    <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 1">
-                    <div class="blog-content">
-                        <a href="#">
-                            <h4>[Blog Title]</h4>
-                        </a>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </div>
-                <div class="small-blog">
-                    <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 2">
-                    <div class="blog-content">
-                        <a href="#">
-                            <h4>[Blog Title]</h4>
-                        </a>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </div>
-                <div class="small-blog">
-                    <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 3">
-                    <div class="blog-content">
-                        <a href="#">
-                            <h4>[Blog Title]</h4>
-                        </a>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
-    </div>
+
     <div id="introduction">
         <div>
             <h2>PHIM ĐANG CHIẾU TẠI VIECINEMA</h2>

@@ -398,6 +398,10 @@ body::-webkit-scrollbar {
   min-height: 1200px;
   gap: 30px;
 }
+.rows{
+    width: 100%;
+    justify-content : center;
+}
 .card-row{
   width: 100%;
   max-height: 580px;
