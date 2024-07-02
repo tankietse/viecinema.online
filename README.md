@@ -5,7 +5,11 @@
 
 This Spring Boot application provides a user-friendly platform for online movie ticket booking. Users can browse movies, select showtimes and seats, and securely purchase tickets. The system also includes an admin interface for managing movie listings, theaters, showtimes, and bookings.
 ## UI
-![IPAD-MOCKUP!](../UI/iPad Mockup.png)
+
+![IPAD-MOCKUP!](/UI/Celestial%20Laptop%20Mockup.png)
+![IPAD-MOCKUP!](/UI/iPad%20Mockup%20Home.png)
+![IPAD-MOCKUP!](/UI/iPad%20Mockup%20Movie%20detail.png)
+![IPAD-MOCKUP!](/UI/iPad%20Mockup.png)
 ## Features
 
 ### User Interface:
