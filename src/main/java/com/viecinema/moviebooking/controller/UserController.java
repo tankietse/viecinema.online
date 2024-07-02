@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
+
 @Controller
 public class UserController {
 
@@ -43,6 +46,8 @@ public class UserController {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
+        user.setRole(User.UserRole.valueOf("CUSTOMER"));
+        user.setLocked(false);
         userService.saveUser(user);
         return "redirect:/login";
     }
@@ -58,5 +63,28 @@ public class UserController {
 
         model.addAttribute("message", "Password reset instructions have been sent to your email.");
         return "user/forgot-pass";
+    }
+
+    @GetMapping("/user-profile")
+    public String getUserProfile(Model model, Principal principal) {
+        String username = principal.getName();
+        User user = userService.getUserByUsername(username).orElse(null);
+        model.addAttribute("user", user);
+        return "user/user-profile";
+    }
+
+    @PostMapping("/user-profile")
+    public String updateUserProfile(User updatedUser, Principal principal) {
+        String username = principal.getName();
+        User existingUser = userService.getUserByUsername(username).orElse(null);
+
+        if (existingUser != null) {
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setPhone_number(updatedUser.getPhone_number());
+            existingUser.setUpdatedAt(LocalDateTime.now());
+
+            userService.updateUserInfo(existingUser);
+        }
+        return "redirect:/user-profile";
     }
 }

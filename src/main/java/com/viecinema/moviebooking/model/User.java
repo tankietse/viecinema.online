@@ -30,14 +30,14 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @NotBlank(message = "Bạn cần nhập số điện thoại")
+//    @NotBlank(message = "Bạn cần nhập số điện thoại")
     @Size(min = 10, message = "Số điện thoại không hợp lệ")
     @Column(name = "phone_number" , nullable = false)
     private String phone_number;
 
-    @NotBlank(message = "Dữ liệu bắt buộc")
+//    @NotBlank(message = "Dữ liệu bắt buộc")
     @Email(message = "Không đúng định dạng")
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column(name = "locked", nullable = false)
