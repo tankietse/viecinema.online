@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm thẻ tín dụng</title>
+    <link rel="icon" type="image/svg+xml"  th:href="@{/static/img/Vie.svg}" />
+    <link rel="stylesheet" type="text/css"  th:href="@{/static/css/login.css}">
+</head>
+<body>
+<section class="app">
+    <div class="container">
+        <div class="login-form">
+            <h1>THANH TOÁN</h1>
+
+            <form  action="#" method="POST">
+                <div style="position: relative; width: 100%;" class="input-place">
+                    <input type="text" id="username" name="username" placeholder="Tên chủ thẻ" autocomplete="username" required>       
+                </div>
+                <div style="position: relative; width: 100%;"  class="input-place">
+                    <input type="password"  name="password" placeholder="Số thẻ" style="width: 100%;" required>
+                </div>
+                <div style="display: flex; justify-content:space-between; margin: 0px;" 
+                class="input-place" >
+                    <input style="width: 136px;" type="number" name="date" placeholder="Hạn" style="width: 100%;" required>
+                    <input style="width: 136px;" type="password" name="ccv" placeholder="CCV" style="width: 100%;" required>
+                </div>
+
+                <button type="submit" class="btn-login">Đăng ký ngay</button>
+            </form>
+
+            <div class="login-with-others">
+                <hr>
+                <p><strong>Đăng nhập bằng</strong> phương thức khác:</p>
+                <a class="google-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static//img/momologo.webp}" alt="MOMO">
+                    <span>Tiếp tục với MOMO</span>
+                </a>
+                <br>
+                <a class="facebook-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static//img/paypal (1).png]" alt="Paypal">
+                    <span>Tiếp tục với Paypal</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

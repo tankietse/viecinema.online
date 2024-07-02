@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký tài khoản của bạn</title>
+    <link rel="icon" type="image/svg+xml"  th:href="@{/static/img/Vie.svg}" />
+    <link rel="stylesheet" type="text/css"  th:href="@{/static/css/login.css}">
+</head>
+<body>
+<section class="app">
+    <div class="container">
+        <div class="login-form">
+            <h1>ĐĂNG KÝ</h1>
+
+            <form  th:action="@{/register}" method="POST">
+                <div style="position: relative; width: 100%;" class="input-place">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Tên người dùng" autocomplete="username" required>
+                    <img  th:src="@{/static/img/user-profile 1.png}"
+                          class="position-absolute top-50 start-100 translate-middle"
+                          alt="">
+                </div>
+                <div style="position: relative; width: 100%;"  class="input-place">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Mật khẩu" style="width: 100%;" autocomplete="current-password" required>
+                    <img th:src="@{/static/img/eye-password-hide.svg}"
+                         class="position-absolute top-50 start-100 translate-middle"
+                         alt="">
+                </div>
+                <div style="position: relative; width: 100%;" class="input-place">
+                    <label for="confirm-password">Confirm Password:</label>
+                    <input type="password" id="confirm-password" name="confirmPassword" placeholder="Xác minh" style="width: 100%;" autocomplete="current-password" required>
+                    <img  th:src="@{/static/img/eye-password-hide.svg}"
+                          class="position-absolute top-50 start-100 translate-middle"
+                          alt="">
+                </div>
+
+                <button type="submit" class="btn-login">Đăng ký ngay</button>
+            </form>
+
+            <div class="login-with-others">
+                <hr>
+                <p><strong>Đăng ký bằng</strong> phương thức khác:</p>
+                <a class="google-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static/img/google-logo.png}" alt="Google">
+                    <span>Tiếp tục với Google</span>
+                </a>
+                <br>
+                <a class="facebook-btn"  href="#" target="_blank">
+                    <img  th:src="@{/static/img/facebook-logo.png}" alt="Facebook">
+                    <span>Tiếp tục với  Facebook</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

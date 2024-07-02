@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Vie Cinema: Hệ Thống Rạp Chiếu Phim Hại Điện</title>
+        <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
+        <link rel="stylesheet" th:href="@{/static/css/home.css}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.0/lazysizes.min.js" async></script>
+        <!-- Include any specific meta tags or CSS/JS files for this page -->
+    </head>
+    <body>
+    <!-- Include layout -->
+    <section layout:fragment="content">
+        <div class="container custom-scrollbar">
+            <div class="slider">
+                <div class="list">
+                    <div class="item">
+                        <img class="d-block w-100 lazyload"
+                             th:src="@{/static/img/placeholder.png}"
+                             data-src="https://image.tmdb.org/t/p/original/vblTCXOWUQGSc837vgbhDRi4HSc.jpg"
+                             alt="Movie Poster 1">
+                    </div>
+                    <div class="item">
+                        <img class="d-block w-100 lazyload"
+                             th:src="@{/static/img/placeholder.png}"
+                             th:data-src="@{/static/img/chào bạn mới.png}"
+                             alt="Movie Poster 2">
+                    </div>
+                    <div class="item">
+                        <img class="d-block w-100 lazyload"
+                             th:src="@{/static/img/placeholder.png}"
+                             th:data-src="@{/static/img/minion.png}"
+                             alt="Movie Poster 3">
+                    </div>
+                    <div class="item">
+                        <img class="d-block w-100 lazyload"
+                             th:src="@{/static/img/placeholder.png}"
+                             th:data-src="@{/static/img/insideout-2.png}"
+                             alt="Movie Poster 4">
+                    </div>
+                    <div class="item">
+                        <img class="d-block w-100 lazyload"
+                             th:src="@{/static/img/placeholder.png}"
+                             data-src="https://image.tmdb.org/t/p/original/fDmci71SMkfZM8RnCuXJVDPaSdE.jpg"
+                             alt="Movie Poster 5">
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button id="prev"><</button>
+                    <button id="next">></button>
+                </div>
+                <ul class="dots">
+                    <li></li>
+                    <li class="active"></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="top-content">
+                <div>
+                    <ul class="task-list">
+                        <li id="new-movie" class="page-active" th:data-url="@{/home}">Phim mới</li>
+                        <li id="now-playing" th:data-url="@{/now-playing}">Đang chiếu</li>
+                        <li id="coming-soon" th:data-url="@{/coming-soon}">Sắp chiếu</li>
+                        <li id="IMAX">IMAX</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="middle-content">
+                <div class= "rows" th:each="row : ${#numbers.sequence(0, movies.size() / 4)}">
+                    <div class="card-row">
+                        <div th:each="movie : ${movies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, movies.size()))}" class="movie-cards">
+                            <div class="card-item">
+                                <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
+                            </div>
+                            <span class="movie-title" th:text="${movie.title}"></span>
+                            <div class="overlay">
+                                <div class="card-buttons">
+                                    <a href="#" class="buy-ticket">Mua vé</a>
+                                    <a href="#" class="watch-trailer" th:data-video-id="${movie.videoId}">Xem trailer</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Video Modal -->
+                    <div id="videoModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close video-close">&times;</span>
+                            <iframe id="videoFrame" src=""  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            <div id="videoError" style="color: rgb(255, 123, 0); display: none;">Không thể phát video. Vui lòng thử lại sau.</div>
+                        </div>
+                    </div>
+
+                    <div id="consentModal" class="cookie-law-info-bar">
+                        <div class="cookies-content">
+                            <div>
+                                <span class="close consent-close">&times;</span>
+                                <h4>Cookies consent for VieCinema.com</h4>
+                                <p>We use cookies on our website to help us provide you with the best, most relevant experience, for analytics and to improve functionality. We may share your information with advertising and analytics partners. You may disable cookies through your browser, but this will limit the functions of the website. Learn more about privacy on our website.</p>
+                                <p>By clicking accept, you consent to the use of all cookies.</p>
+                            </div>
+                            <div class="cookies-buttons">
+                                <button id="declineCookies">Decline</button>
+                                <button id="acceptCookies">Accept</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button th:href="@{/now-playing}" id="btn-more">Xem thêm</button>
+                <hr>
+            </div>
+
+            <div class="bottom-content">
+                <div>
+                    <ul class="task-list">
+                        <li id="cinema-corner"><b>Góc điện ảnh</b></li>
+                        <li id="movie-commentary">Bình luận phim</li>
+                        <li id="blogs">Blog điện ảnh</li>
+                    </ul>
+                </div>
+                <div class="blog-container">
+                    <div class="main-blog">
+                        <!-- <button class="play-button" class="watch-trailer" data-video-id="9phK0prtuJM">
+                          <i class="play-icon"></i> </button>
+                        </button> -->
+                        <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="movie-name">
+                        <h3 rel="#">Inside Out 2: Thảm họa cảm xúc tuổi dậy thì</h3>
+                    </div>
+                    <div class="small-blogs">
+                        <div class="small-blog">
+                            <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 1">
+                            <div class="blog-content">
+                                <a href="#">
+                                    <h4>[Blog Title]</h4>
+                                </a>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                            </div>
+                        </div>
+                        <div class="small-blog">
+                            <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 2">
+                            <div class="blog-content">
+                                <a href="#">
+                                    <h4>[Blog Title]</h4>
+                                </a>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                            </div>
+                        </div>
+                        <div class="small-blog">
+                            <img data-src="https://image.tmdb.org/t/p/w500/wAIFnJ5OeFU7tTnCWHiROsszS29.jpg" th:src="@{/static/img/placeholder.png}" class="lazyload" alt="Blog 3">
+                            <div class="blog-content">
+                                <a href="#">
+                                    <h4>[Blog Title]</h4>
+                                </a>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </div>
+            <div id="introduction">
+                <div>
+                    <h2>TRANG CHỦ</h2>
+                    <p>
+                        Đến website VieCinema.online, khách hàng sẽ dễ dàng tham khảo các <strong>phim hay nhất</strong>, <strong>phim mới nhất</strong> đang chiếu hoặc sắp chiếu luôn được cập nhật thường xuyên.<br>
+                        <strong>Lịch chiếu</strong> tại tất cả hệ thống <strong>rạp chiếu phim</strong> của <strong>Vie Cinema</strong> cũng được cập nhật đầy đủ hàng ngày hàng giờ trên <strong>trang chủ</strong>.
+                    </p>
+                    <p>
+                        Giờ đây đặt vé tại <strong>Vie Cinema</strong> càng thêm dễ dàng chỉ với <em>vài thao tác vô cùng đơn giản</em>. Để mua vé, hãy vào tab <strong>Mua vé</strong>. Quý khách có thể chọn <strong>Mua vé</strong> theo phim, theo rạp, hoặc theo ngày. Sau đó, tiến hành mua vé theo các bước hướng dẫn. Chỉ trong vài phút, quý khách sẽ nhận được tin nhắn và email phản hồi <strong>Đặt vé thành công</strong> của <strong>Vie Cinema</strong>. Quý khách có thể dùng tin nhắn lấy vé tại quầy vé của <strong>Vie Cinema</strong> hoặc quét mã QR để một bước vào rạp mà không cần tốn thêm bất kỳ công đoạn nào nữa.
+                    </p>
+                    <p>
+                        Nếu bạn đã chọn được <strong>phim hay</strong> để xem, hãy đặt vé cực nhanh bằng box <strong>Mua Vé Nhanh</strong> ngay từ <strong>Trang Chủ</strong>. Chỉ cần một phút, tin nhắn và email phản hồi của <strong>Vie Cinema</strong> sẽ gửi ngay vào điện thoại và hộp mail của bạn.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    </body>
+</html>

@@ -56,7 +56,7 @@ public class TMDBApiClient {
     }
 
     public List<TrailerDTO> getMovieTrailers(int tmdbId) {
-        String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=vi-VN&api_key=%s", tmdbId, apiKey);
+        String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=en-US&api_key=%s", tmdbId, apiKey);
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + accessToken)

@@ -48,6 +48,17 @@ public class MovieService {
         return movies.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    public List<MovieDTO> getMoviesFromMonth(int startMonth, int numMonths) {
+        LocalDate now = LocalDate.now();
+        LocalDate startDate = now.withMonth(startMonth).withDayOfMonth(1);
+        LocalDate endDate = startDate.plusMonths(numMonths).withDayOfMonth(startDate.plusMonths(numMonths).lengthOfMonth());
+
+        List<Movie> movies = movieRepository.findByReleaseDateBetween(startDate, endDate);
+        return movies.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+
+
     public List<MovieDTO> getComingSoonMovies() {
         LocalDate now = LocalDate.now();
         List<Movie> movies = movieRepository.findByReleaseDateAfter(now);

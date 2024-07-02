@@ -18,7 +18,7 @@
 <body>
 <header class="header">
     <div class="logo">
-        <a href="/home" class="pointer-event underline-none">
+        <a th:href="@{/home}" class="pointer-event underline-none">
             <div class="vie-cinema">VieCinema</div>
         </a>
     </div>
@@ -55,31 +55,21 @@
     </nav>
     <div class="header-right">
         <a class="ticket-link" href="#">
-            <img alt="Ticket" class="ticket-image" th:src="@{static/img/mua-v.png">
+            <img alt="Ticket" class="ticket-image" th:src="@{static/img/mua-v.png}">
         </a>
         <div class="search-box">
             <a class="search-icon" title="Tìm kiếm">
                 <i class="fas fa-search"></i>
             </a>
         </div>
-        <button class="login-btn">Login</button>
+        <a href="/login">
+            <button class="login-btn">Login</button>
+        </a>
         <div class="account-btn">
             <img th:src="@{static/img/user-profile 1.png}" alt="User Profile">
         </div>
-        <div class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </div>
     </div>
 </header>
-<div class="overlay" onclick="closeMenu()"></div>
-    <nav class="mobile-nav">
-        <ul>
-            <li><a href="#">Phim mới</a></li>
-            <li><a href="#">Góc điện ảnh</a></li>
-            <li><a href="#">Sự kiện</a></li>
-            <li><a href="#">Login</a></li>
-        </ul>
-    </nav>
 <main  layout:fragment="content">
         <!-- Content sẽ được thay thế -->
 </main >
@@ -143,6 +133,176 @@
     </div>
     <h4 class="Footer_footer_bottom_content">VIECINEMA 2024 © All Rights Reserved</h4>
 </footer>
+<script>
+    let list = document.querySelector(".slider .list");
+    let items = document.querySelectorAll(".slider .list .item");
+    let dots = document.querySelectorAll(".slider .dots li");
+    let prev = document.getElementById('prev');
+    let next = document.getElementById("next");
+
+    let active = 1;
+    let lengthItem = items.length - 1;
+
+    next.onclick = function () {
+      if (active + 1 > lengthItem) {
+        active = 0;
+      } else {
+        active += 1;
+      }
+      reloadSlider();
+    };
+
+    prev.onclick = function () {
+      if (active - 1 <0) {
+        active = lengthItem;
+      } else {
+        active -= 1;
+      }
+      reloadSlider();
+    };
+
+    let refreshSlider = setInterval(() => {
+      next.click();
+    }, 5000);
+
+    function reloadSlider() {
+      let checkLeft = items[active].offsetLeft;
+      list.style.left = -checkLeft + 'px';
+
+      let lastActiveDot = document.querySelector('.slider .dots li.active');
+      if (lastActiveDot) {
+        lastActiveDot.classList.remove('active');
+      }
+      dots[active].classList.add('active');
+      clearInterval(refreshSlider);
+      refreshSlider = setInterval(() => {
+        next.click();
+      }, 5000);
+    }
+
+    dots.forEach((li, key) => {
+      li.addEventListener('click', function () {
+        active = key;
+        reloadSlider();
+      });
+    });
+
+    reloadSlider(); // Ensure initial state is correct
+</script>
+<script>
+    // Get modal elements
+    var modal = document.getElementById("videoModal");
+    var videoFrame = document.getElementById("videoFrame");
+    var span = document.getElementsByClassName("close")[0];
+
+    // Add event listeners to "Xem trailer" buttons
+    var trailerButtons = document.querySelectorAll(".watch-trailer");
+    trailerButtons.forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        var videoId = this.getAttribute("data-video-id");
+        var videoUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
+
+        // Reset iframe src
+        videoFrame.src = "";
+
+        // Set iframe src to video URL and display modal
+        videoFrame.src = videoUrl;
+        modal.style.display = "block";
+      });
+    });
+
+    // Close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+      videoFrame.src = "";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+        videoFrame.src = "";
+      }
+    }
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var videoModal = document.getElementById('videoModal');
+        var videoFrame = document.getElementById('videoFrame');
+        var videoClose = document.querySelector('.video-close');
+
+        var consentModal = document.getElementById('consentModal');
+        var consentClose = document.querySelector('.consent-close');
+        var acceptCookies = document.getElementById('acceptCookies');
+        var declineCookies = document.getElementById('declineCookies');
+
+        // Function to show video modal
+        function showModal(videoUrl) {
+            videoFrame.src = videoUrl;
+            videoModal.style.display = 'flex';
+        }
+
+        // Function to close video modal
+        videoClose.onclick = function() {
+            videoModal.style.display = 'none';
+            videoFrame.src = '';
+        }
+
+        // Function to close consent modal
+        consentClose.onclick = function() {
+            consentModal.style.display = 'none';
+        }
+
+        // Check if consent was already given
+        if (!localStorage.getItem('cookiesAccepted')) {
+            consentModal.style.display = 'flex';
+        }
+
+        // Handle cookie consent actions
+        acceptCookies.onclick = function() {
+            localStorage.setItem('cookiesAccepted', 'true');
+            consentModal.style.display = 'none';
+        }
+
+        declineCookies.onclick = function() {
+            consentModal.style.display = 'none';
+        }
+
+        // Close video modal when clicking outside the modal
+        window.onclick = function(event) {
+            if (event.target == videoModal) {
+                videoModal.style.display = 'none';
+                videoFrame.src = '';
+            }
+            if (event.target == consentModal) {
+                consentModal.style.display = 'none';
+            }
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const taskList = document.querySelectorAll('.task-list li');
+
+    taskList.forEach(function (item) {
+      item.addEventListener('click', function () {
+        // Remove active class from all items
+        taskList.forEach(function (li) {
+          li.classList.remove('page-active');
+        });
+        // Add active class to the clicked item
+        this.classList.add('page-active');
+
+        // Navigate to the corresponding page
+        const url = this.getAttribute('data-url');
+        if (url) {
+          window.location.href = url;
+        }
+      });
+    });
+  });
+</script>
 
 <!-- Bootstrap JS links -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" async></script> -->
