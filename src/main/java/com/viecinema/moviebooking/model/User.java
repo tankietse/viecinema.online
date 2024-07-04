@@ -3,7 +3,6 @@ package com.viecinema.moviebooking.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "users", indexes = {
+        @Index(name = "email_index", columnList = "email"),
+        @Index(name = "username_index", columnList = "username")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,13 +51,13 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
-    @Column(name = "created_at") // Ánh xạ tới cột "created_at"
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at") // Ánh xạ tới cột "updated_at"
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public enum UserRole {
-        ADMIN, CUSTOMER, THEATER_OWNER;
+        ADMIN, CUSTOMER;
     }
 }

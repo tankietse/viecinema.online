@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vie: Phim đang chiếu</title>
+    <title>Vie: Phim sắp tới</title>
     <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
     <link rel="stylesheet" th:href="@{/static/css/home.css}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.0/lazysizes.min.js" async></script>
@@ -20,16 +20,16 @@
             <div>
                 <ul class="task-list">
                     <li id="new-movie"  th:data-url="@{/home}">Phim</li>
-                    <li id="now-playing" class="page-active" th:data-url="@{/now-playing}">Đang chiếu</li>
-                    <li id="coming-soon" th:data-url="@{/coming-soon}">Sắp chiếu</li>
+                    <li id="now-playing"  th:data-url="@{/now-playing}">Đang chiếu</li>
+                    <li id="coming-soon" class="page-active" th:data-url="@{/coming-soon}">Sắp chiếu</li>
                     <li id="IMAX" >IMAX</li>
                 </ul>
             </div>
         </div>
         <div class="middle-content">
-            <div th:each="row : ${#numbers.sequence(0, nowPlayingMovies.size() / 4)}">
+            <div th:each="row : ${#numbers.sequence(0, comingSoonMovies.size() / 4)}">
                 <div class="card-row">
-                    <div th:each="movie : ${nowPlayingMovies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, nowPlayingMovies.size()))}" class="movie-cards">
+                    <div th:each="movie : ${comingSoonMovies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, comingSoonMovies.size()))}" class="movie-cards">
                         <div class="card-item">
                             <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
                         </div>
@@ -69,23 +69,23 @@
             <hr>
         </div>
 
-    <div id="introduction">
-        <div>
-            <h2>PHIM ĐANG CHIẾU TẠI VIECINEMA</h2>
-            <p>
-                Chào mừng bạn đến với <strong>VieCinema.online</strong>! Tại đây, chúng tôi luôn cập nhật nhanh chóng và đầy đủ nhất các <strong>phim đang chiếu</strong> hot nhất, được yêu thích nhất. Bạn có thể dễ dàng tìm thấy những bộ phim bom tấn, những bộ phim tình cảm lãng mạn, hay những bộ phim hành động gay cấn.
-            </p>
-            <p>
-                Hãy vào tab <strong>Phim đang chiếu</strong> để khám phá ngay danh sách các bộ phim nổi bật. Bạn sẽ tìm thấy thông tin chi tiết về từng bộ phim, bao gồm trailer, lịch chiếu, và những đánh giá từ khán giả. Với hệ thống <strong>rạp chiếu phim</strong> hiện đại của <strong>Vie Cinema</strong>, trải nghiệm xem phim của bạn sẽ tuyệt vời hơn bao giờ hết.
-            </p>
-            <p>
-                Đặt vé ngay hôm nay để không bỏ lỡ bất kỳ khoảnh khắc nào của những bộ phim đặc sắc. Chỉ với vài thao tác đơn giản, bạn có thể chọn mua vé theo phim, theo rạp, hoặc theo ngày. Sau khi hoàn tất đặt vé, bạn sẽ nhận được tin nhắn và email xác nhận <strong>Đặt vé thành công</strong> từ <strong>Vie Cinema</strong>. Hãy sử dụng tin nhắn hoặc mã QR để nhận vé tại rạp mà không cần phải chờ đợi lâu.
-            </p>
-            <p>
-                Nếu bạn đang tìm kiếm một trải nghiệm xem phim hoàn hảo, đừng quên sử dụng box <strong>Mua Vé Nhanh</strong> ngay từ <strong>Trang Chủ</strong>. Chỉ trong một phút, bạn sẽ nhận được phản hồi đặt vé ngay lập tức từ chúng tôi. Tham gia ngay và trải nghiệm những phút giây thư giãn tuyệt vời cùng <strong>Vie Cinema</strong>!
-            </p>
+        <div id="introduction">
+            <div>
+                <h2>PHIM SẮP CÓ TẠI VIECINEMA</h2>
+                <p>
+                    Chào mừng bạn đến với <strong>VieCinema.online</strong>! Tại đây, chúng tôi luôn cập nhật nhanh chóng và đầy đủ nhất các <strong>phim đang chiếu</strong> hot nhất, được yêu thích nhất. Bạn có thể dễ dàng tìm thấy những bộ phim bom tấn, những bộ phim tình cảm lãng mạn, hay những bộ phim hành động gay cấn.
+                </p>
+                <p>
+                    Hãy vào tab <strong>Phim đang chiếu</strong> để khám phá ngay danh sách các bộ phim nổi bật. Bạn sẽ tìm thấy thông tin chi tiết về từng bộ phim, bao gồm trailer, lịch chiếu, và những đánh giá từ khán giả. Với hệ thống <strong>rạp chiếu phim</strong> hiện đại của <strong>Vie Cinema</strong>, trải nghiệm xem phim của bạn sẽ tuyệt vời hơn bao giờ hết.
+                </p>
+                <p>
+                    Đặt vé ngay hôm nay để không bỏ lỡ bất kỳ khoảnh khắc nào của những bộ phim đặc sắc. Chỉ với vài thao tác đơn giản, bạn có thể chọn mua vé theo phim, theo rạp, hoặc theo ngày. Sau khi hoàn tất đặt vé, bạn sẽ nhận được tin nhắn và email xác nhận <strong>Đặt vé thành công</strong> từ <strong>Vie Cinema</strong>. Hãy sử dụng tin nhắn hoặc mã QR để nhận vé tại rạp mà không cần phải chờ đợi lâu.
+                </p>
+                <p>
+                    Nếu bạn đang tìm kiếm một trải nghiệm xem phim hoàn hảo, đừng quên sử dụng box <strong>Mua Vé Nhanh</strong> ngay từ <strong>Trang Chủ</strong>. Chỉ trong một phút, bạn sẽ nhận được phản hồi đặt vé ngay lập tức từ chúng tôi. Tham gia ngay và trải nghiệm những phút giây thư giãn tuyệt vời cùng <strong>Vie Cinema</strong>!
+                </p>
+            </div>
         </div>
-    </div>
     </div>
 </section>
 </body>

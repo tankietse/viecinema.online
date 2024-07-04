@@ -12,7 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "trailers")
+@Table(name = "trailers", indexes = {
+        @Index(name = "movie_id_index", columnList = "movie_id"),
+        @Index(name = "tmdb_trailer_id_index", columnList = "tmdb_trailer_id")
+})
 public class Trailer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

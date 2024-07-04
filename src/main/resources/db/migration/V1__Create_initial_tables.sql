@@ -4,23 +4,31 @@ CREATE TABLE genres (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Bảng actors
-CREATE TABLE actors (
-    actor_id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE persons (
+    person_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     bio TEXT,
     date_of_birth DATE,
     nationality VARCHAR(100)
 );
 
--- Bảng directors
-CREATE TABLE directors (
-    director_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    bio TEXT,
-    date_of_birth DATE,
-    nationality VARCHAR(100)
-);
+---- Bảng actors
+--CREATE TABLE actors (
+--    actor_id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(255) NOT NULL,
+--    bio TEXT,
+--    date_of_birth DATE,
+--    nationality VARCHAR(100)
+--);
+--
+---- Bảng directors
+--CREATE TABLE directors (
+--    director_id INT PRIMARY KEY AUTO_INCREMENT,
+--    name VARCHAR(255) NOT NULL,
+--    bio TEXT,
+--    date_of_birth DATE,
+--    nationality VARCHAR(100)
+--);
 
 -- Bảng movies (cập nhật)
 CREATE TABLE movies (
@@ -73,7 +81,9 @@ CREATE TABLE screens (
     theater_id INT,
     name VARCHAR(50),
     capacity INT,
+    screen_type_id INT,
     FOREIGN KEY (theater_id) REFERENCES theaters(theater_id)
+    FOREIGN KEY (screen_type_id) REFERENCES screen_types(screen_type_id);
 );
 
 -- Bảng seat_types (cập nhật)
@@ -82,15 +92,17 @@ CREATE TABLE seat_types (
     type_name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Bảng staffs
 CREATE TABLE staffs (
     staff_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone_number VARCHAR(20),
     role VARCHAR(50) NOT NULL,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    theater_id INT,
+    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id)
 );
+
 
 -- Bảng users (cập nhật)
 CREATE TABLE users (
@@ -120,8 +132,13 @@ CREATE TABLE promotions (
     min_purchase_amount DECIMAL(10,2),
     max_discount_amount DECIMAL(10,2),
     usage_limit INT,
-    times_used INT DEFAULT 0
+    times_used INT DEFAULT 0,
+    user_id INT NULL,
+    booking_id INT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
 );
+
 
 -- Bảng showtimes
 CREATE TABLE showtimes (
@@ -208,23 +225,32 @@ CREATE TABLE movie_genres (
     FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
 );
 
--- Bảng movie_actors
-CREATE TABLE movie_actors (
+CREATE TABLE movie_persons (
     movie_id INT,
-    actor_id INT,
-    PRIMARY KEY (movie_id, actor_id),
+    person_id INT,
+    role ENUM('actor', 'director') NOT NULL,
+    PRIMARY KEY (movie_id, person_id, role),
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
-    FOREIGN KEY (actor_id) REFERENCES actors(actor_id)
+    FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
 
--- Bảng movie_directors
-CREATE TABLE movie_directors (
-    movie_id INT,
-    director_id INT,
-    PRIMARY KEY (movie_id, director_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
-    FOREIGN KEY (director_id) REFERENCES directors(director_id)
-);
+---- Bảng movie_actors
+--CREATE TABLE movie_actors (
+--    movie_id INT,
+--    actor_id INT,
+--    PRIMARY KEY (movie_id, actor_id),
+--    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
+--    FOREIGN KEY (actor_id) REFERENCES actors(actor_id)
+--);
+--
+---- Bảng movie_directors
+--CREATE TABLE movie_directors (
+--    movie_id INT,
+--    director_id INT,
+--    PRIMARY KEY (movie_id, director_id),
+--    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
+--    FOREIGN KEY (director_id) REFERENCES directors(director_id)
+--);
 
 -- Bảng booking_history
 CREATE TABLE booking_history (
@@ -239,13 +265,55 @@ CREATE TABLE booking_history (
 
 -- Bảng statistics
 CREATE TABLE statistics (
-    date DATE,
+    statistics_id INT PRIMARY KEY AUTO_INCREMENT,
     movie_id INT,
-    total_revenue DECIMAL(10, 2),
-    tickets_sold INT,
-    PRIMARY KEY (date, movie_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
+    theater_id INT,
+    date DATE,
+    total_tickets_sold INT DEFAULT 0,
+    total_revenue DECIMAL(10, 2) DEFAULT 0.00,
+    average_ticket_price DECIMAL(10, 2) DEFAULT 0.00,
+    promotion_count INT DEFAULT 0,
+    showtime_count INT DEFAULT 0,
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
+    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id),
+    UNIQUE KEY (date, movie_id, theater_id)
 );
+DELIMITER //
+
+CREATE TRIGGER after_booking_insert
+AFTER INSERT ON bookings
+FOR EACH ROW
+BEGIN
+    DECLARE v_total_tickets_sold INT;
+    DECLARE v_total_revenue DECIMAL(10, 2);
+    DECLARE v_average_ticket_price DECIMAL(10, 2);
+
+    -- Tính tổng vé đã bán
+    SELECT COUNT(*)
+    INTO v_total_tickets_sold
+    FROM booking_seats
+    WHERE booking_id = NEW.booking_id;
+
+    -- Tính tổng doanh thu
+    SELECT SUM(price)
+    INTO v_total_revenue
+    FROM booking_seats
+    WHERE booking_id = NEW.booking_id;
+
+    -- Tính giá vé trung bình
+    SET v_average_ticket_price = v_total_revenue / v_total_tickets_sold;
+
+    -- Cập nhật bảng statistics
+    INSERT INTO statistics (movie_id, theater_id, date, total_tickets_sold, total_revenue, average_ticket_price)
+    VALUES (NEW.movie_id, (SELECT theater_id FROM screens WHERE screen_id = NEW.screen_id), CURDATE(), v_total_tickets_sold, v_total_revenue, v_average_ticket_price)
+    ON DUPLICATE KEY UPDATE
+        total_tickets_sold = total_tickets_sold + v_total_tickets_sold,
+        total_revenue = total_revenue + v_total_revenue,
+        average_ticket_price = (total_revenue + v_total_revenue) / (total_tickets_sold + v_total_tickets_sold);
+END//
+
+DELIMITER ;
+
 
 -- Bảng prices
 CREATE TABLE prices (

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    List<Payment> findByBookingId(Long bookingId);
+public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+    List<Payment> findByBookingBookingId(Integer bookingId);
 
     List<Payment> findByPaymentMethod(PaymentMethod paymentMethod);
 

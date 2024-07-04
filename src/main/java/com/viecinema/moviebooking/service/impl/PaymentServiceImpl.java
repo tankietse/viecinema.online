@@ -21,7 +21,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment getPaymentById(Long paymentId) {
+    public Payment getPaymentById(Integer paymentId) {
         Optional<Payment> payment = paymentRepository.findById(paymentId);
         return payment.orElse(null);
     }
@@ -32,8 +32,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getPaymentsByBookingId(Long bookingId) {
-        return paymentRepository.findByBookingId(bookingId);
+    public List<Payment> getPaymentsByBookingId(Integer bookingId) {
+        return paymentRepository.findByBookingBookingId(bookingId);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void deletePayment(Long paymentId) {
+    public void deletePayment(Integer paymentId) {
         paymentRepository.deleteById(paymentId);
     }
 

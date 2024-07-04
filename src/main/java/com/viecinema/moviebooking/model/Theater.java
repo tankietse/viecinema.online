@@ -11,7 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "theaters")
+@Table(name = "theaters", indexes = {
+        @Index(name = "city_state_index", columnList = "city, state"),
+        @Index(name = "name_index", columnList = "name")
+})
 public class Theater {
 
     @Id

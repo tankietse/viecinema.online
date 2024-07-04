@@ -78,7 +78,7 @@ public class ScheduleService {
             return new ScheduleDTO(
                     savedSchedule.getScheduleId(),
                     savedSchedule.getMovie().getId(),
-                    savedSchedule.getScreen().getScreenId(),
+                    savedSchedule.getScreen().getId(),
                     Math.toIntExact(savedSchedule.getTheater().getTheaterId()),
                     savedSchedule.getStartTime(),
                     savedSchedule.getEndTime()

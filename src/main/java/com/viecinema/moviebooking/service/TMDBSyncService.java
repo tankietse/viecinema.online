@@ -2,10 +2,7 @@ package com.viecinema.moviebooking.service;
 
 import com.viecinema.moviebooking.dto.MovieDTO;
 import com.viecinema.moviebooking.dto.TrailerDTO;
-import com.viecinema.moviebooking.model.Genre;
-import com.viecinema.moviebooking.model.Movie;
-import com.viecinema.moviebooking.model.MovieDynamicData;
-import com.viecinema.moviebooking.model.Trailer;
+import com.viecinema.moviebooking.model.*;
 import com.viecinema.moviebooking.repository.MovieDynamicDataRepository;
 import com.viecinema.moviebooking.repository.MovieRepository;
 import com.viecinema.moviebooking.repository.TrailerRepository;
