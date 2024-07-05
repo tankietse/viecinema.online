@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Rạp Chiếu</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container mt-4">
+        <div class="d-flex mb-4">
+            <button class="btn btn-light btn-create d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#createModal">
+                <span class="material-symbols-outlined">
+                    add
+                </span>
+                Tạo rạp chiếu
+            </button>
+            <button class="btn btn-info btn-refresh d-flex align-items-center" onclick="location.reload()">
+                <span class="material-symbols-outlined">
+                    refresh
+                </span>
+                Refresh
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-header">
+                <tr>
+                    <th scope="col">Tên rạp chiếu</th>
+                    <th scope="col">Địa chỉ</th>
+                    <th scope="col">Sức chứa</th>
+                    <th scope="col">Liên hệ</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="table-row" th:each="theater : ${theaters}" data-bs-toggle="modal" th:data-bs-target="'#editModal_' + ${theater.theaterId}">
+                    <td><a href="#" class="text-primary" th:text="${theater.name}"></a></td>
+                    <td th:text="${theater.address}"></td>
+                    <td th:text="${theater.capacity}"></td>
+                    <td th:text="${theater.phoneNumber}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Tạo rạp chiếu mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/admin/theaters/create}" method="post">
+                        <div class="mb-3">
+                            <label for="newTheaterName" class="form-label">Tên rạp chiếu</label>
+                            <input type="text" class="form-control" id="newTheaterName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newTheaterAddress" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="newTheaterAddress" name="address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newTheaterCity" class="form-label">Thành phố</label>
+                            <input type="text" class="form-control" id="newTheaterCity" name="city" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newTheaterPhoneNumber" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="newTheaterPhoneNumber" name="phoneNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newTheaterCapacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="newTheaterCapacity" name="capacity" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Tạo mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal -->
+    <div th:each="theater : ${theaters}" th:id="'editModal_' + ${theater.theaterId}" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'editModalLabel_' + ${theater.theaterId}" th:text="'Chỉnh sửa ' + ${theater.name}"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{'/admin/theaters/edit/' + ${theater.theaterId}}" method="post">
+                        <div class="mb-3">
+                            <label for="theaterName" class="form-label">Tên rạp chiếu</label>
+                            <input type="text" class="form-control" id="theaterName" name="name" th:value="${theater.name}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="theaterAddress" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="theaterAddress" name="address" th:value="${theater.address}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="theaterCity" class="form-label">Thành phố</label>
+                            <input type="text" class="form-control" id="theaterCity" name="city" th:value="${theater.city}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="theaterPhoneNumber" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="theaterPhoneNumber" name="phoneNumber" th:value="${theater.phoneNumber}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="theaterCapacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="theaterCapacity" name="capacity" th:value="${theater.capacity}" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

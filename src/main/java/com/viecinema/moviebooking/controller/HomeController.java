@@ -18,7 +18,7 @@ public class HomeController {
     public String home(Model model) {
         LocalDate now = LocalDate.now();
         int startMonth = now.minusMonths(1).getMonthValue();
-        int numMonths = 3; //mac dinh 3 thang
+        int numMonths = 2; //mac dinh 2 thang
 
         model.addAttribute("movies", movieService.getMoviesFromMonth(startMonth, numMonths));
         return "movie/home";

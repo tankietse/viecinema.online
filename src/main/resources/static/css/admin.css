@@ -49,3 +49,13 @@ body {
 .collapse-item {
     padding-left: 40px; 
 }
+
+.btn-create,
+.btn-refresh {
+    margin-right: 10px;
+}
+.table {
+    border-radius: 1rem;
+    overflow: hidden;
+    min-width: 1200px;
+}

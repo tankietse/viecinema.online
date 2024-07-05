@@ -437,6 +437,27 @@ button:focus,
   border-radius: 10px;
 }
 
+.rating {
+  display: flex;
+  position: relative;
+  justify-content: end;
+  width: 85%;
+  height: 25px;
+  bottom: 40px;
+  color: white;
+}
+
+.rating-bar {
+  width: 70px;
+  height: 20px;
+}
+
+.star-icon, .point {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  transform: translateY(-50%);
+}
 img.lazyload {
   opacity: 0;
   transition: opacity 1000ms;
@@ -446,14 +467,14 @@ img.lazyloaded {
   transition: 1s;
   opacity: 1;
 }
-.movie-cards .card-item img {
+.movie-cards .card-item .card-img {
   width: 100%;
   height: 100%;
   transition: transform 0.3s ease;
   object-fit: cover;
 }
 
-.movie-cards:hover .card-item img {
+.movie-cards:hover .card-item .card-img {
   transform: scale(1.1);
 }
 
@@ -469,7 +490,7 @@ img.lazyloaded {
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
 }
 
 .movie-cards .overlay .card-buttons {

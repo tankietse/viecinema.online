@@ -42,7 +42,7 @@ public class AdminAPIController {
 
     // Hủy lịch chiếu
     @DeleteMapping("/cancel-schedules/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Integer id) {
         scheduleService.deleteSchedule(id);
         return ResponseEntity.noContent().build();
     }

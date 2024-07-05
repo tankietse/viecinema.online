@@ -18,6 +18,6 @@ public class MovieBookingApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		tmdbSyncService.syncPopularMovies();// Synchronize all popular movies
+		tmdbSyncService.syncPopularMovies();
 	}
 }

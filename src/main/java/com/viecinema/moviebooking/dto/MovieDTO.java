@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class MovieDTO {
     private int id;
-//    private int tmdbID;
+    private int tmdbID;
     private String title;
     private String overview;
     private String posterPath;

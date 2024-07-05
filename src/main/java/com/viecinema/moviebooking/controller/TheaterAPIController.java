@@ -21,7 +21,7 @@ public class TheaterAPIController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Theater> getTheaterById(@PathVariable Long id) {
+    public ResponseEntity<Theater> getTheaterById(@PathVariable Integer id) {
         return theaterService.getTheaterById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -40,15 +40,12 @@ public class TheaterAPIController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Theater> updateTheater(@PathVariable Long id, @RequestBody Theater theaterDetails) {
+    public ResponseEntity<Theater> updateTheater(@PathVariable Integer id, @RequestBody Theater theaterDetails) {
         return theaterService.getTheaterById(id)
                 .map(theater -> {
                     theater.setName(theaterDetails.getName());
                     theater.setAddress(theaterDetails.getAddress());
                     theater.setCity(theaterDetails.getCity());
-                    theater.setState(theaterDetails.getState());
-                    theater.setPostalCode(theaterDetails.getPostalCode());
-                    theater.setCountry(theaterDetails.getCountry());
                     theater.setPhoneNumber(theaterDetails.getPhoneNumber());
                     theater.setCapacity(theaterDetails.getCapacity());
                     return ResponseEntity.ok(theaterService.saveTheater(theater));
@@ -57,7 +54,7 @@ public class TheaterAPIController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTheater(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTheater(@PathVariable Integer id) {
         theaterService.deleteTheater(id);
         return ResponseEntity.noContent().build();
     }

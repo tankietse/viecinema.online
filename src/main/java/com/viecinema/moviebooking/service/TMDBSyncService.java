@@ -3,24 +3,33 @@ package com.viecinema.moviebooking.service;
 import com.viecinema.moviebooking.dto.MovieDTO;
 import com.viecinema.moviebooking.dto.TrailerDTO;
 import com.viecinema.moviebooking.model.*;
-import com.viecinema.moviebooking.repository.MovieDynamicDataRepository;
-import com.viecinema.moviebooking.repository.MovieRepository;
-import com.viecinema.moviebooking.repository.TrailerRepository;
+import com.viecinema.moviebooking.repository.*;
 import com.viecinema.moviebooking.util.TMDBApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TMDBSyncService {
 
-    private final MovieRepository movieRepository;
-    private final MovieDynamicDataRepository movieDynamicDataRepository;
+    @Autowired
+    private MovieRepository movieRepository;
+    @Autowired
+    private MovieDynamicDataRepository movieDynamicDataRepository;
     private final TMDBApiClient tmdbApiClient;
-    private final TrailerRepository trailerRepository;
+    @Autowired
+    private TrailerRepository trailerRepository;
+    @Autowired
+    private PersonRepository personRepository;
+    @Autowired
+    private GenreRepository genreRepository;
 
     @Autowired
     public TMDBSyncService(MovieRepository movieRepository,

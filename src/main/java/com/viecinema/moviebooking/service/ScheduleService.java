@@ -35,7 +35,7 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
-    public Optional<Schedule> getScheduleById(Long id) {
+    public Optional<Schedule> getScheduleById(Integer id) {
         return scheduleRepository.findById(id);
     }
 
@@ -43,7 +43,7 @@ public class ScheduleService {
         Schedule schedule = new Schedule();
         Optional<Movie> movie = movieRepository.findById(scheduleDTO.getMovieId());
         Optional<Screen> screen = screenRepository.findById(scheduleDTO.getScreenId());
-        Optional<Theater> theater = theaterRepository.findById(Long.valueOf(scheduleDTO.getTheaterId()));
+        Optional<Theater> theater = theaterRepository.findById(scheduleDTO.getTheaterId());
 
         if (movie.isPresent() && screen.isPresent() && theater.isPresent()) {
             schedule.setMovie(movie.get());
@@ -57,11 +57,10 @@ public class ScheduleService {
         }
     }
     public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
-        // Tạo đối tượng Schedule từ ScheduleDTO
         Schedule schedule = new Schedule();
         Optional<Movie> movie = movieRepository.findById(scheduleDTO.getMovieId());
         Optional<Screen> screen = screenRepository.findById(scheduleDTO.getScreenId());
-        Optional<Theater> theater = theaterRepository.findById(Long.valueOf(scheduleDTO.getTheaterId())); // Chuyển đổi theaterId sang Long
+        Optional<Theater> theater = theaterRepository.findById(scheduleDTO.getTheaterId());
 
         // Kiểm tra xem movie, screen và theater có tồn tại hay không
         if (movie.isPresent() && screen.isPresent() && theater.isPresent()) {
@@ -71,10 +70,8 @@ public class ScheduleService {
             schedule.setStartTime(scheduleDTO.getStartTime());
             schedule.setEndTime(scheduleDTO.getEndTime());
 
-            // Lưu lịch chiếu mới vào cơ sở dữ liệu
             Schedule savedSchedule = scheduleRepository.save(schedule);
 
-            // Chuyển đổi Schedule thành ScheduleDTO và trả về
             return new ScheduleDTO(
                     savedSchedule.getScheduleId(),
                     savedSchedule.getMovie().getId(),
@@ -88,7 +85,7 @@ public class ScheduleService {
         }
     }
 
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Integer id) {
         scheduleRepository.deleteById(id);
     }
 

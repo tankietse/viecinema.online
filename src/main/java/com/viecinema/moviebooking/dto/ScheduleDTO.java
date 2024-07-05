@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ScheduleDTO {
-    private Long scheduleId;
+    private Integer scheduleId;
     private Integer movieId;
     private Integer screenId;
     private Integer theaterId;
@@ -14,7 +14,7 @@ public class ScheduleDTO {
     private LocalDateTime endTime;
 
     // Constructor
-    public ScheduleDTO(Long scheduleId, Integer movieId, Integer screenId, Integer theaterId, LocalDateTime startTime, LocalDateTime endTime) {
+    public ScheduleDTO(Integer scheduleId, Integer movieId, Integer screenId, Integer theaterId, LocalDateTime startTime, LocalDateTime endTime) {
         this.scheduleId = scheduleId;
         this.movieId = movieId;
         this.screenId = screenId;
