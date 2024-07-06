@@ -86,7 +86,7 @@
                             <span class="movie-title" th:text="${movie.title}"></span>
                             <div class="overlay">
                                 <div class="card-buttons">
-                                    <a href="#" class="buy-ticket">Mua vé</a>
+                                    <a th:href="@{/movie-detail(id=${movie.id})}" class="movie-detail buy-ticket">Mua vé</a>
                                     <a href="#" class="watch-trailer" th:data-video-id="${movie.videoId}">Xem trailer</a>
                                 </div>
                             </div>
