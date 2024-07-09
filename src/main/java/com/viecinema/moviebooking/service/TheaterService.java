@@ -22,7 +22,7 @@ public class TheaterService {
         return theaterRepository.findById(id);
     }
     public Optional<Theater> getTheaterByName(String name) {
-        return theaterRepository.findByName(name);
+        return theaterRepository.findByTheaterName(name);
     }
 
     public Theater saveTheater(Theater theater) {

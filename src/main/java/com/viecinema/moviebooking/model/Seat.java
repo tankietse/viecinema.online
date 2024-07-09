@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "seats", indexes = {
-        @Index(name = "screen_id_index", columnList = "screen_id"),
         @Index(name = "seat_type_id_index", columnList = "seat_type_id")
 })
 public class Seat {
@@ -19,14 +18,10 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer seatId;
 
-    @ManyToOne
-    @JoinColumn(name = "screen_id")
-    private Screen screen;
+    @Column(name = "row_num")
+    private int rowNumber;
 
-    @Column(name = "row_name")
-    private String rowName;
-
-    @Column(name = "seat_number")
+    @Column(name = "seat_num")
     private int seatNumber;
 
     @ManyToOne

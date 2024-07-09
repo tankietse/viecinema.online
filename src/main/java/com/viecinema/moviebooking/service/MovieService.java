@@ -1,12 +1,8 @@
 package com.viecinema.moviebooking.service;
 
 import com.viecinema.moviebooking.dto.MovieDTO;
-import com.viecinema.moviebooking.model.Movie;
-import com.viecinema.moviebooking.model.MovieDynamicData;
-import com.viecinema.moviebooking.model.Trailer;
-import com.viecinema.moviebooking.repository.MovieDynamicDataRepository;
-import com.viecinema.moviebooking.repository.MovieRepository;
-import com.viecinema.moviebooking.repository.TrailerRepository;
+import com.viecinema.moviebooking.model.*;
+import com.viecinema.moviebooking.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +22,21 @@ public class MovieService {
 
     @Autowired
     private TrailerRepository trailerRepository;
+
+    @Autowired
+//    private ShowtimeRepository showtimeRepository;
+//
+//    @Autowired
+//    private ScreeningRepository screeningRepository;
+//
+//    @Autowired
+//    private ScreenRepository screenRepository;
+//
+//    @Autowired
+//    private TheaterRepository theaterRepository;
+//
+//    @Autowired
+//    private SeatRepository seatRepository;
 
     public List<MovieDTO> getAllMovies() {
         List<Movie> movies = movieRepository.findAll();

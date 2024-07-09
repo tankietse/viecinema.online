@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +20,7 @@ public class SeatType {
 
     @Column(name = "type_name", unique = true, nullable = false)
     private String typeName;
+
+    @Column(name = "seat_price")
+    private BigDecimal seatPrice;
 }

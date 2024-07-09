@@ -7,7 +7,7 @@ import com.viecinema.moviebooking.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -47,28 +47,28 @@ public class BookingService {
         return bookingRepository.findByShowtimeMovie(movie);
     }
 
-    public List<Booking> getBookingsAfter(LocalDateTime bookingDate) {
+    public List<Booking> getBookingsAfter(LocalDate bookingDate) {
         return bookingRepository.findByBookingDateAfter(bookingDate);
     }
 
-    public List<Booking> getBookingsBefore(LocalDateTime bookingDate) {
+    public List<Booking> getBookingsBefore(LocalDate bookingDate) {
         return bookingRepository.findByBookingDateBefore(bookingDate);
     }
 
-    public List<Booking> getBookingsBetween(LocalDateTime startTime, LocalDateTime endTime) {
-        return bookingRepository.findByBookingDateBetween(startTime, endTime);
+    public List<Booking> getBookingsBetween(LocalDate startDate, LocalDate endDate) {
+        return bookingRepository.findByBookingDateBetween(startDate, endDate);
     }
 
-    public List<Booking> getBookingsByShowTimeAfter(LocalDateTime startTime) {
-        return bookingRepository.findByShowtimeStartTimeAfter(startTime);
+    public List<Booking> getBookingsByShowDateAfter(LocalDate startDate) {
+        return bookingRepository.findByShowtimeStartDateAfter(startDate);
     }
 
-    public List<Booking> getBookingsByShowTimeBefore(LocalDateTime startTime) {
-        return bookingRepository.findByShowtimeStartTimeBefore(startTime);
+    public List<Booking> getBookingsByShowDateBefore(LocalDate startDate) {
+        return bookingRepository.findByShowtimeStartDateBefore(startDate);
     }
 
-    public List<Booking> getBookingsByShowTimeBetween(LocalDateTime startTime, LocalDateTime endTime) {
-        return bookingRepository.findByShowtimeStartTimeBetween(startTime, endTime);
+    public List<Booking> getBookingsByShowDateBetween(LocalDate startDate, LocalDate endDate) {
+        return bookingRepository.findByShowtimeStartDateBetween(startDate, endDate);
     }
 
     // nếu cần thêm mn tự làm thêm nha

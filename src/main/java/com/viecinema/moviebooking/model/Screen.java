@@ -20,7 +20,7 @@ public class Screen {
     @Column(name = "screen_id")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "screen_name")
     private String name;
 
     @Column(name = "capacity")
@@ -33,4 +33,8 @@ public class Screen {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screen_type_id", nullable = false)
     private ScreenType screenType;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "seat_id", nullable = false)
+    private Seat seat;
 }

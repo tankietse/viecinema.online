@@ -79,17 +79,28 @@ CREATE TABLE theaters (
 CREATE TABLE screens (
     screen_id INT PRIMARY KEY AUTO_INCREMENT,
     theater_id INT,
-    name VARCHAR(50),
+    screening_id INT,
+    screen_name VARCHAR(50),
     capacity INT,
     screen_type_id INT,
-    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id)
-    FOREIGN KEY (screen_type_id) REFERENCES screen_types(screen_type_id);
+    FOREIGN KEY (screening_id) REFERENCES screenings(screening_id),
+    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id),
+    FOREIGN KEY (screen_type_id) REFERENCES screen_types(screen_type_id)
 );
+
+
+CREATE TABLE screen_types (
+  screen_type_id INT AUTO_INCREMENT PRIMARY KEY,
+  type_name VARCHAR(255) NOT NULL,
+  screen_price DECIMAL(10, 2) NOT NULL
+);
+
 
 -- Bảng seat_types (cập nhật)
 CREATE TABLE seat_types (
     seat_type_id INT PRIMARY KEY AUTO_INCREMENT,
-    type_name VARCHAR(50) UNIQUE NOT NULL
+    type_name VARCHAR(50) UNIQUE NOT NULL,
+    seat_price DECIMAL(10, 2),
 );
 
 CREATE TABLE staffs (
@@ -144,22 +155,37 @@ CREATE TABLE promotions (
 CREATE TABLE showtimes (
     showtime_id INT PRIMARY KEY AUTO_INCREMENT,
     movie_id INT,
-    screen_id INT,
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
-    FOREIGN KEY (screen_id) REFERENCES screens(screen_id),
     INDEX idx_movie_id (movie_id),
-    INDEX idx_start_time_end_time (start_time, end_time)
+    INDEX idx_start_date_end_date (start_date, end_date)
 );
+
+-- Bảng suất chiếu
+CREATE TABLE screenings (
+    screening_id INT PRIMARY KEY AUTO_INCREMENT,
+    showtime_id INT,
+    screen_id INT,
+    screening_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    FOREIGN KEY (showtime_id) REFERENCES showtimes(showtime_id),
+    FOREIGN KEY (screen_id) REFERENCES screens(screen_id),
+    INDEX idx_showtime_id (showtime_id),
+    INDEX idx_screen_id (screen_id),
+    UNIQUE (showtime_id, screening_date)
+);
+
 
 -- Bảng seats (cập nhật)
 CREATE TABLE seats (
     seat_id INT PRIMARY KEY AUTO_INCREMENT,
     screen_id INT,
-    row_name VARCHAR(5),
+    row_number INT,
     seat_number INT,
     seat_type_id INT,
+
     FOREIGN KEY (screen_id) REFERENCES screens(screen_id),
     FOREIGN KEY (seat_type_id) REFERENCES seat_types(seat_type_id),
     UNIQUE KEY (screen_id, row_name, seat_number)
@@ -234,24 +260,6 @@ CREATE TABLE movie_persons (
     FOREIGN KEY (person_id) REFERENCES persons(person_id)
 );
 
----- Bảng movie_actors
---CREATE TABLE movie_actors (
---    movie_id INT,
---    actor_id INT,
---    PRIMARY KEY (movie_id, actor_id),
---    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
---    FOREIGN KEY (actor_id) REFERENCES actors(actor_id)
---);
---
----- Bảng movie_directors
---CREATE TABLE movie_directors (
---    movie_id INT,
---    director_id INT,
---    PRIMARY KEY (movie_id, director_id),
---    FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
---    FOREIGN KEY (director_id) REFERENCES directors(director_id)
---);
-
 -- Bảng booking_history
 CREATE TABLE booking_history (
     history_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -314,13 +322,3 @@ END//
 
 DELIMITER ;
 
-
--- Bảng prices
-CREATE TABLE prices (
-    price_id INT PRIMARY KEY AUTO_INCREMENT,
-    seat_type_id INT,
-    showtime_id INT,
-    price DECIMAL(10, 2),
-    FOREIGN KEY (seat_type_id) REFERENCES seat_types(seat_type_id),
-    FOREIGN KEY (showtime_id) REFERENCES showtimes(showtime_id)
-);

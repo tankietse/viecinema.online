@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vie Cinema: Hệ Thống Rạp Chiếu Phim Hại Điện</title>
+    <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
+    <link rel="stylesheet" th:href="@{/static/css/seat.css}">
+    <link rel="stylesheet" th:href="@{/static/css/movie-detail.css}">
+    <script th:src="@{/static/js/detail.js}" defer></script>
+    <!-- Include any specific meta tags or CSS/JS files for this page -->
+</head>
+<body>
+<!-- Include layout -->
+<section layout:fragment="content">
+    <div class="main-container custom-scrollbar">
+        <div class="back-drop">
+            <a href="#" class="watch-trailer" th:data-video-id="${movie.videoId}">
+                <img id="back-drop-img" th:src="@{'https://image.tmdb.org/t/p/original' + ${movie.backdropPath}}" alt=>
+            </a>
+
+        </div>
+        <!-- Video Modal -->
+        <div id="videoModal" class="modal">
+            <div class="modal-content">
+                <span class="close video-close">&times;</span>
+                <iframe id="videoFrame" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div id="videoError" style="color: rgb(255, 123, 0); display: none;">Không thể phát video. Vui lòng thử lại sau.</div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="movie-card">
+                <!-- Movie Information Section -->
+                <div class="movie-info">
+                    <img th:data-src="'https://image.tmdb.org/t/p/original' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}"  class="lazyload movie-poster">
+                    <div class="text-info">
+                        <p>
+                            <strong>Tên phim:</strong>
+                            <span th:text="${movie.title}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Thể loại:</strong>
+                            <span th:text="${#strings.listJoin(movie.genres, ', ')}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Thời lượng:</strong>
+                            <span th:text="${movie.runtimeMinutes} + ' phút'"></span>
+                        </p>
+
+                        <p>
+                            <strong>Ngôn ngữ:</strong>
+                            <span th:text="${movie.originalLanguage}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Độ tuổi:</strong>
+                            <span th:if="${movie.adult}">Người lớn (18+)</span>
+                            <span th:unless="${movie.adult}">Mọi độ tuổi</span>
+                        </p>
+
+                        <hr style="width: 60%;">
+
+                        <div class="detail-rating">
+                            <div class="stars">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                      th:style="${movie.voteAverage >= i * 2 ? '' : 'opacity: 0.3;'}">
+                                    ⭐
+                                </span>
+                            </div>
+                            <span th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 'POINT', 1, 'POINT')} + '/10'"></span>
+                        </div>
+
+
+
+                        <hr style="width: 60%;">
+                    </div>
+                    <div class="movie-description">
+                        <h3>Thông tin phim</h3>
+                        <p><strong></strong> <span th:text="${movie.overview}"></span></p>
+                    </div>
+                </div>
+
+                <!-- Showtimes and Booking Section -->
+                <div class="showtimes"  >
+                    <div th:each="showtime, iterStat : ${showtimes}" data-showtime-id="1">
+                        <h2>Lịch chiếu</h2>
+                        <div class="dates">
+                        <span class="material-symbols-outlined">
+                          arrow_back_ios
+                        </span>
+                            <button class="date" th:each="date, dateStat : ${showtimeDates[iterStat.index]}"
+                                    th:data-date="${#strings.arraySplit(date, '|')[0]}"
+                                    th:data-weekday="${#strings.arraySplit(date, '|')[1]}"
+                                    th:utext="${#strings.arraySplit(date, '|')[0] + '<br /><b>' + #strings.arraySplit(date, '|')[1] + '</b>'}"
+                                    th:classappend="${dateStat.index == 0} ? ' selected'">
+                            </button>
+                            <span class="material-symbols-outlined">
+                          arrow_forward_ios
+                        </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="location">
+                        <span class="material-symbols-outlined">distance</span>
+                        <span class="current-location">Tp. Hồ Chí Minh</span>
+                        <div class="location-dropdown">
+                            <a href="#">Tp. Hồ Chí Minh</a>
+                            <a href="#">Hà Nội</a>
+                            <a href="#">Đà Nẵng</a>
+                            <a href="#">Cần Thơ</a>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="search-bar">
+                        <input type="text" placeholder="Tìm Rạp">
+                        <span class="material-symbols-outlined">
+                          search
+                        </span>
+                    </div>
+                    <div class="cinemas" th:each="showtime, iterStat: ${showtimes}" th:id="'cinemas-' + ${iterStat.index}"></div>
+                    <div class="booking-summary">
+                        <h3 id="summary-theater-name" style="margin-bottom: 50px;">_ _ _</h3>
+                        <p id="summary-date" style="font-size: 14px;">_ _ . _ _</p>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <h3 id="summary-screen-type">_ _ _</h3>
+                            <p><b id="summary-time">_ _ : _ _</b></p>
+                        </div>
+                        <p style="font-size: 12px; margin-bottom: 50px;">*Việc lựa chọn chổ ngồi có thể được thực hiện sau đó</p>
+                        <button id="book-now">ĐẶT VÉ NGAY</button>
+                    </div>
+
+                    <div id="seat-modal" class="seat-modal">
+                        <h2>CHỌN GHẾ</h2>
+                        <div class="seat-map">
+                            <div class="left-seats">
+                                <!-- Generate dãy ghế trái -->
+                            </div>
+                            <div class="aisle" style="width: 50px;"></div>
+                            <div class="right-seats">
+                                <!-- Generate dãy ghế phải -->
+                            </div>
+                        </div>
+                        <div class="screen">Màn chiếu ở đây</div>
+                        <div style="display: flex; height: 100px;">
+                            <div class="seat-info">
+                                <div class="total">
+                                    <span>Tổng</span>
+                                    <span id="total">0 vnd</span>
+                                </div>
+                                <div class="seats">
+                                    <span>Vị trí</span>
+                                    <span id="selected-seats">None</span>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button id="cancel">Hủy bỏ</button>
+                                <button id="pay">THANH TOÁN</button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div id="seat-overlay"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+

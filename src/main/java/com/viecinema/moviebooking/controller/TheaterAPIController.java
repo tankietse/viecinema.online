@@ -43,7 +43,7 @@ public class TheaterAPIController {
     public ResponseEntity<Theater> updateTheater(@PathVariable Integer id, @RequestBody Theater theaterDetails) {
         return theaterService.getTheaterById(id)
                 .map(theater -> {
-                    theater.setName(theaterDetails.getName());
+                    theater.setTheaterName(theaterDetails.getTheaterName());
                     theater.setAddress(theaterDetails.getAddress());
                     theater.setCity(theaterDetails.getCity());
                     theater.setPhoneNumber(theaterDetails.getPhoneNumber());

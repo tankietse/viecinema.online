@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "showtimes", indexes = {
         @Index(name = "movie_id_index", columnList = "movie_id"),
-        @Index(name = "start_time_end_time_index", columnList = "start_time, end_time"),
-        @Index(name = "screen_id_index", columnList = "screen_id")
+        @Index(name = "start_date_end_date_index", columnList = "start_date, end_date"),
 })
 public class Showtime {
     @Id
@@ -26,13 +26,12 @@ public class Showtime {
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @ManyToOne
-    @JoinColumn(name = "screen_id")
-    private Screen screen;
+    @Column(name = "start_date")
+    private LocalDate startDate;
 
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
-    @Column(name = "end_time")
-    private LocalDateTime endTime;
+    @OneToMany(mappedBy = "showtime")
+    private List<Screening> screenings;
 }

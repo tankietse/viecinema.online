@@ -2,7 +2,7 @@ package com.viecinema.moviebooking.dto;
 
 import java.time.LocalDateTime;
 
-public record BookingHistoryDto(
+public record BookingHistoryDTO(
         Integer historyId,
         Integer bookingId,
         Integer userId,

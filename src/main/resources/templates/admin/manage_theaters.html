@@ -38,12 +38,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="table-row" th:each="theater : ${theaters}" data-bs-toggle="modal" th:data-bs-target="'#editModal_' + ${theater.theaterId}">
-                    <td><a href="#" class="text-primary" th:text="${theater.name}"></a></td>
-                    <td th:text="${theater.address}"></td>
-                    <td th:text="${theater.capacity}"></td>
-                    <td th:text="${theater.phoneNumber}"></td>
-                </tr>
+                    <tr class="table-row" th:each="theater : ${theaters}" data-bs-toggle="modal" th:data-bs-target="'#editModal_' + ${theater.theaterId}">
+                        <td><a href="#" class="text-primary" th:text="${theater.theaterName}"></a></td>
+                        <td th:text="${theater.address}"></td>
+                        <td th:text="${theater.capacity}"></td>
+                        <td th:text="${theater.phoneNumber}"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

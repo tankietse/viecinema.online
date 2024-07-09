@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +26,11 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/home", "/login", "/register","/forgot-pass","/movie-detail","/now-playing","/coming-soon", "/static/**","/error/**").permitAll()
+                                .requestMatchers(
+                                        "/home", "/login", "/register", "/forgot-pass",
+                                        "/movie-detail", "/get-screenings-by-date",
+                                        "/now-playing", "/coming-soon", "/static/**", "/error/**"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(formLogin ->
@@ -39,10 +44,14 @@ public class SecurityConfig {
                         logout
                                 .logoutSuccessUrl("/home")
                                 .permitAll()
+                )
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 );
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

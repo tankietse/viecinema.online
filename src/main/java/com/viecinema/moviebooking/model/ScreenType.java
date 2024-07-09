@@ -3,6 +3,8 @@ package com.viecinema.moviebooking.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = "screen_types")
@@ -14,4 +16,7 @@ public class ScreenType {
 
     @Column(name = "type_name")
     private String typeName;
+
+    @Column(name = "screen_price")
+    private BigDecimal screenPrice;
 }

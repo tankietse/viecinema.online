@@ -1,6 +1,6 @@
 package com.viecinema.moviebooking.service;
 
-import com.viecinema.moviebooking.dto.BookingHistoryDto;
+import com.viecinema.moviebooking.dto.BookingHistoryDTO;
 import com.viecinema.moviebooking.model.Booking;
 import com.viecinema.moviebooking.model.BookingHistory;
 import com.viecinema.moviebooking.repository.BookingHistoryRepository;
@@ -19,16 +19,16 @@ public class BookingHistoryService {
         this.bookingHistoryRepository = bookingHistoryRepository;
     }
 
-    public List<BookingHistoryDto> getBookingHistoryByBooking(Booking booking) {
+    public List<BookingHistoryDTO> getBookingHistoryByBooking(Booking booking) {
         return bookingHistoryRepository.findByBooking(booking).stream()
-                .map(this::convertToDto)
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     // Can them CRUD tự làm nha ae :]]
 
-    private BookingHistoryDto convertToDto(BookingHistory bookingHistory) {
-        return new BookingHistoryDto(
+    private BookingHistoryDTO convertToDTO(BookingHistory bookingHistory) {
+        return new BookingHistoryDTO(
                 bookingHistory.getHistoryId(),
                 bookingHistory.getBooking().getBookingId(),
                 bookingHistory.getUser().getId(),

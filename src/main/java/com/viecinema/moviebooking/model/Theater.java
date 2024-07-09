@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "theaters", indexes = {
         @Index(name = "city_index", columnList = "city"),
-        @Index(name = "name_index", columnList = "name")
+        @Index(name = "theater_name_index", columnList = "theater_name")
 })
 public class Theater {
     @Id
@@ -23,8 +23,8 @@ public class Theater {
     private Integer theaterId;
 
     @NotEmpty(message = "Không được để trống")
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "theater_name", nullable = false)
+    private String theaterName;
 
     @NotEmpty(message = "Không được để trống")
     @Column(name = "address")

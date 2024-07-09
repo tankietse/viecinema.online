@@ -79,7 +79,7 @@
                                     <svg class="rating-bar" xmlns="http://www.w3.org/2000/svg" width="90" height="26" viewBox="0 0 90 26" fill="none">
                                         <img th:src="@{/static/img/star.png}" alt="Star Rating" class="star-icon">
                                         <path d="M1.71543 9.15139C-1.58642 6.04965 0.608568 0.507141 5.1388 0.507141H84.7258C87.4872 0.507141 89.7258 2.74572 89.7258 5.50714V20.4128C89.7258 23.1742 87.4872 25.4128 84.7258 25.4128H21.0061C19.734 25.4128 18.5098 24.9279 17.5827 24.057L1.71543 9.15139Z" fill="black" fill-opacity="0.5"/>
-                                        <span class="point" th:text="${movie.voteAverage}"></span>
+                                        <span class="point" th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 'POINT', 1, 'POINT')}"></span>
                                     </svg>
                                 </div>
                             </div>

@@ -6,7 +6,7 @@ import com.viecinema.moviebooking.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -17,15 +17,15 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByShowtimeMovie(Movie movie);
 
 
-    List<Booking> findByBookingDateAfter(LocalDateTime bookingDate);
+    List<Booking> findByBookingDateAfter(LocalDate bookingDate);
 
-    List<Booking> findByBookingDateBefore(LocalDateTime bookingDate);
+    List<Booking> findByBookingDateBefore(LocalDate bookingDate);
 
-    List<Booking> findByBookingDateBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<Booking> findByBookingDateBetween(LocalDate startDate, LocalDate endDate);
 
-    List<Booking> findByShowtimeStartTimeAfter(LocalDateTime startTime);
+    List<Booking> findByShowtimeStartDateAfter(LocalDate startDate);
 
-    List<Booking> findByShowtimeStartTimeBefore(LocalDateTime startTime);
+    List<Booking> findByShowtimeStartDateBefore(LocalDate startDate);
 
-    List<Booking> findByShowtimeStartTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<Booking> findByShowtimeStartDateBetween(LocalDate startDate, LocalDate endDate);
 }
