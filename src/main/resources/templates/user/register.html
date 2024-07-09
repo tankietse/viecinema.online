@@ -15,21 +15,21 @@
 
             <form  th:action="@{/register}" method="POST">
                 <div style="position: relative; width: 100%;" class="input-place">
-                    <label for="username">Username:</label>
+                    <label for="username"></label>
                     <input type="text" id="username" name="username" placeholder="Tên người dùng" autocomplete="username" required>
                     <img  th:src="@{/static/img/user-profile 1.png}"
                           class="position-absolute top-50 start-100 translate-middle"
                           alt="">
                 </div>
                 <div style="position: relative; width: 100%;"  class="input-place">
-                    <label for="password">Password:</label>
+                    <label for="password"></label>
                     <input type="password" id="password" name="password" placeholder="Mật khẩu" style="width: 100%;" autocomplete="current-password" required>
                     <img th:src="@{/static/img/eye-password-hide.svg}"
                          class="position-absolute top-50 start-100 translate-middle"
                          alt="">
                 </div>
                 <div style="position: relative; width: 100%;" class="input-place">
-                    <label for="confirm-password">Confirm Password:</label>
+                    <label for="confirm-password"></label>
                     <input type="password" id="confirm-password" name="confirmPassword" placeholder="Xác minh" style="width: 100%;" autocomplete="current-password" required>
                     <img  th:src="@{/static/img/eye-password-hide.svg}"
                           class="position-absolute top-50 start-100 translate-middle"

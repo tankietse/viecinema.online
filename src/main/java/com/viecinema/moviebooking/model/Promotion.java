@@ -12,7 +12,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "promotions")
+@Table(name = "promotions", indexes = {
+        @Index(name = "code_index", columnList = "code"),
+        @Index(name = "user_id_index", columnList = "user_id"),
+        @Index(name = "booking_id_index", columnList = "booking_id")
+})
 public class Promotion {
     public enum DiscountType {
         PERCENTAGE,
@@ -57,4 +61,12 @@ public class Promotion {
 
     @Column(name = "times_used")
     private Integer timesUsed;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 }

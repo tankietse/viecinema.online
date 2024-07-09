@@ -8,48 +8,46 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Vie Cinema: Hệ Thống Rạp Chiếu Phim Hại Điện</title>
         <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
-        <link rel="stylesheet" th:href="@{/static/css/home.css}">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.0/lazysizes.min.js" async></script>
         <!-- Include any specific meta tags or CSS/JS files for this page -->
     </head>
     <body>
     <!-- Include layout -->
     <section layout:fragment="content">
-        <div class="container custom-scrollbar">
+        <div class="main-container custom-scrollbar">
             <div class="slider">
                 <div class="list">
                     <div class="item">
-                        <img class="d-block w-100 lazyload"
+                        <img class="d-block  lazyload"
                              th:src="@{/static/img/placeholder.png}"
                              data-src="https://image.tmdb.org/t/p/original/vblTCXOWUQGSc837vgbhDRi4HSc.jpg"
                              alt="Movie Poster 1">
                     </div>
                     <div class="item">
-                        <img class="d-block w-100 lazyload"
+                        <img class="d-block  lazyload"
                              th:src="@{/static/img/placeholder.png}"
                              th:data-src="@{/static/img/chào bạn mới.png}"
                              alt="Movie Poster 2">
                     </div>
                     <div class="item">
-                        <img class="d-block w-100 lazyload"
+                        <img class="d-block  lazyload"
                              th:src="@{/static/img/placeholder.png}"
                              th:data-src="@{/static/img/minion.png}"
                              alt="Movie Poster 3">
                     </div>
                     <div class="item">
-                        <img class="d-block w-100 lazyload"
+                        <img class="d-block  lazyload"
                              th:src="@{/static/img/placeholder.png}"
                              th:data-src="@{/static/img/insideout-2.png}"
                              alt="Movie Poster 4">
                     </div>
                     <div class="item">
-                        <img class="d-block w-100 lazyload"
+                        <img class="d-block  lazyload"
                              th:src="@{/static/img/placeholder.png}"
                              data-src="https://image.tmdb.org/t/p/original/fDmci71SMkfZM8RnCuXJVDPaSdE.jpg"
                              alt="Movie Poster 5">
                     </div>
                 </div>
-                <div class="buttons">
+                <div class="control-buttons">
                     <button id="prev"><</button>
                     <button id="next">></button>
                 </div>
@@ -76,30 +74,36 @@
                     <div class="card-row">
                         <div th:each="movie : ${movies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, movies.size()))}" class="movie-cards">
                             <div class="card-item">
-                                <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
+                                <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload card-img">
+                                <div class="rating">
+                                    <svg class="rating-bar" xmlns="http://www.w3.org/2000/svg" width="90" height="26" viewBox="0 0 90 26" fill="none">
+                                        <img th:src="@{/static/img/star.png}" alt="Star Rating" class="star-icon">
+                                        <path d="M1.71543 9.15139C-1.58642 6.04965 0.608568 0.507141 5.1388 0.507141H84.7258C87.4872 0.507141 89.7258 2.74572 89.7258 5.50714V20.4128C89.7258 23.1742 87.4872 25.4128 84.7258 25.4128H21.0061C19.734 25.4128 18.5098 24.9279 17.5827 24.057L1.71543 9.15139Z" fill="black" fill-opacity="0.5"/>
+                                        <span class="point" th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 'POINT', 1, 'POINT')}"></span>
+                                    </svg>
+                                </div>
                             </div>
                             <span class="movie-title" th:text="${movie.title}"></span>
                             <div class="overlay">
                                 <div class="card-buttons">
-                                    <a href="#" class="buy-ticket">Mua vé</a>
+                                    <a th:href="@{/movie-detail(id=${movie.id})}" class="movie-detail buy-ticket">Mua vé</a>
                                     <a href="#" class="watch-trailer" th:data-video-id="${movie.videoId}">Xem trailer</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- Video Modal -->
-                    <div id="videoModal" class="modal">
-                        <div class="modal-content">
-                            <span class="close video-close">&times;</span>
-                            <iframe id="videoFrame" src=""  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <div id="videoModal" class="modal custom-modal">
+                        <div class="custom-modal-content">
+                            <span class="close-btn video-close">&times;</span>
+                            <iframe id="videoFrame" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             <div id="videoError" style="color: rgb(255, 123, 0); display: none;">Không thể phát video. Vui lòng thử lại sau.</div>
                         </div>
                     </div>
-
                     <div id="consentModal" class="cookie-law-info-bar">
-                        <div class="cookies-content">
+                        <div class="my-cookies-content">
                             <div>
-                                <span class="close consent-close">&times;</span>
+                                <span class="close-btn consent-close">&times;</span>
                                 <h4>Cookies consent for VieCinema.com</h4>
                                 <p>We use cookies on our website to help us provide you with the best, most relevant experience, for analytics and to improve functionality. We may share your information with advertising and analytics partners. You may disable cookies through your browser, but this will limit the functions of the website. Learn more about privacy on our website.</p>
                                 <p>By clicking accept, you consent to the use of all cookies.</p>

@@ -9,21 +9,32 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "screens")
+@Table(name = "screens", indexes = {
+        @Index(name = "screen_type_id_index", columnList = "screen_type_id"),
+        @Index(name = "theater_id_index", columnList = "theater_id")
+})
 public class Screen {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "screen_id")
-    private Integer screenId;
+    private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "screen_name")
     private String name;
 
     @Column(name = "capacity")
     private Integer capacity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id", nullable = false)
     private Theater theater;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "screen_type_id", nullable = false)
+    private ScreenType screenType;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "seat_id", nullable = false)
+    private Seat seat;
 }

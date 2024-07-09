@@ -2,7 +2,6 @@ package com.viecinema.moviebooking.util;
 
 import com.viecinema.moviebooking.dto.MovieDTO;
 import com.viecinema.moviebooking.dto.TrailerDTO;
-import com.viecinema.moviebooking.service.TMDBTrailersResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -14,11 +13,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,7 +55,7 @@ public class TMDBApiClient {
     }
 
     public List<TrailerDTO> getMovieTrailers(int tmdbId) {
-        String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=en-US&api_key=%s", tmdbId, apiKey);
+        String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=vi-VN&api_key=%s", tmdbId, apiKey);
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + accessToken)
@@ -86,14 +85,18 @@ public class TMDBApiClient {
         trailerDTO.setName((String) trailerData.get("name"));
         trailerDTO.setKey((String) trailerData.get("key"));
         trailerDTO.setSite((String) trailerData.get("site"));
-        trailerDTO.setSize((int) trailerData.get("size"));
+        trailerDTO.setSize(trailerData.containsKey("size") && trailerData.get("size") != null ? (int) trailerData.get("size") : 0);
         trailerDTO.setType((String) trailerData.get("type"));
-        trailerDTO.setOfficial((boolean) trailerData.get("official"));
+        trailerDTO.setOfficial(Optional.ofNullable(trailerData.get("official"))
+                .map(Boolean.class::cast)
+                .orElse(false));
         String publishedAtString = (String) trailerData.get("published_at");
-        OffsetDateTime publishedAtOffset = OffsetDateTime.parse(publishedAtString);
-        LocalDateTime publishedAtLocal = publishedAtOffset.toLocalDateTime();
-        trailerDTO.setPublishedAt(publishedAtLocal);
-        trailerDTO.setTmdbId((String) trailerData.get("id"));
+        trailerDTO.setPublishedAt(Optional.ofNullable((String) trailerData.get("published_at"))
+                .map(OffsetDateTime::parse)
+                .map(OffsetDateTime::toLocalDateTime)
+                .orElse(null));
+
+        trailerDTO.setTmdbId(String.valueOf(trailerData.get("id")));
         return trailerDTO;
     }
 

@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vie Cinema: Hệ Thống Rạp Chiếu Phim Hại Điện</title>
+    <title>Vie: Phim đang chiếu</title>
     <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
     <link rel="stylesheet" th:href="@{/static/css/home.css}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.0/lazysizes.min.js" async></script>
@@ -15,12 +15,12 @@
 <body>
 <!-- Include layout -->
 <section layout:fragment="content">
-    <div class="container custom-scrollbar">
+    <div class="main-container custom-scrollbar">
         <div class="top-content">
             <div>
                 <ul class="task-list">
-                    <li id="new-movie"  th:th:data-url="@{/home}">Phim</li>
-                    <li id="now-playing" class="page-active" th:th:data-url="@{/now-playing}">Đang chiếu</li>
+                    <li id="new-movie"  th:data-url="@{/home}">Phim</li>
+                    <li id="now-playing" class="page-active" th:data-url="@{/now-playing}">Đang chiếu</li>
                     <li id="coming-soon" th:data-url="@{/coming-soon}">Sắp chiếu</li>
                     <li id="IMAX" >IMAX</li>
                 </ul>
@@ -31,7 +31,14 @@
                 <div class="card-row">
                     <div th:each="movie : ${nowPlayingMovies.subList(row * 4, T(java.lang.Math).min((row + 1) * 4, nowPlayingMovies.size()))}" class="movie-cards">
                         <div class="card-item">
-                            <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload">
+                            <img th:data-src="'https://image.tmdb.org/t/p/w500' + ${movie.posterPath}" alt="" th:src="@{/static/img/placeholder.png}" class="lazyload card-img">
+                            <div class="rating">
+                                <svg class="rating-bar" xmlns="http://www.w3.org/2000/svg" width="90" height="26" viewBox="0 0 90 26" fill="none">
+                                    <img th:src="@{/static/img/star.png}" alt="Star Rating" class="star-icon">
+                                    <path d="M1.71543 9.15139C-1.58642 6.04965 0.608568 0.507141 5.1388 0.507141H84.7258C87.4872 0.507141 89.7258 2.74572 89.7258 5.50714V20.4128C89.7258 23.1742 87.4872 25.4128 84.7258 25.4128H21.0061C19.734 25.4128 18.5098 24.9279 17.5827 24.057L1.71543 9.15139Z" fill="black" fill-opacity="0.5"/>
+                                    <span class="point" th:text="${movie.voteAverage}"></span>
+                                </svg>
+                            </div>
                         </div>
                         <span class="movie-title" th:text="${movie.title}"></span>
                         <div class="overlay">
@@ -44,18 +51,17 @@
                 </div>
 
                 <!-- Video Modal -->
-                <div id="videoModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close video-close">&times;</span>
-                        <iframe id="videoFrame" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <div id="videoModal" class="modal custom-modal">
+                    <div class="custom-modal-content">
+                        <span class="close-btn video-close">&times;</span>
+                        <iframe id="videoFrame" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         <div id="videoError" style="color: rgb(255, 123, 0); display: none;">Không thể phát video. Vui lòng thử lại sau.</div>
                     </div>
                 </div>
-
                 <div id="consentModal" class="cookie-law-info-bar">
                     <div class="cookies-content">
                         <div>
-                            <span class="close consent-close">&times;</span>
+                            <span class="close-btn consent-close">&times;</span>
                             <h4>Cookies consent for VieCinema.com</h4>
                             <p>We use cookies on our website to help us provide you with the best, most relevant experience, for analytics and to improve functionality. We may share your information with advertising and analytics partners. You may disable cookies through your browser, but this will limit the functions of the website. Learn more about privacy on our website.</p>
                             <p>By clicking accept, you consent to the use of all cookies.</p>
@@ -67,7 +73,6 @@
                     </div>
                 </div>
             </div>
-            <button id="btn-more">Xem thêm</button>
             <hr>
         </div>
 
@@ -90,175 +95,5 @@
     </div>
     </div>
 </section>
-<script>
-    let list = document.querySelector(".slider .list");
-    let items = document.querySelectorAll(".slider .list .item");
-    let dots = document.querySelectorAll(".slider .dots li");
-    let prev = document.getElementById('prev');
-    let next = document.getElementById("next");
-
-    let active = 1;
-    let lengthItem = items.length - 1;
-
-    next.onclick = function () {
-      if (active + 1 > lengthItem) {
-        active = 0;
-      } else {
-        active += 1;
-      }
-      reloadSlider();
-    };
-
-    prev.onclick = function () {
-      if (active - 1 <0) {
-        active = lengthItem;
-      } else {
-        active -= 1;
-      }
-      reloadSlider();
-    };
-
-    let refreshSlider = setInterval(() => {
-      next.click();
-    }, 5000);
-
-    function reloadSlider() {
-      let checkLeft = items[active].offsetLeft;
-      list.style.left = -checkLeft + 'px';
-
-      let lastActiveDot = document.querySelector('.slider .dots li.active');
-      if (lastActiveDot) {
-        lastActiveDot.classList.remove('active');
-      }
-      dots[active].classList.add('active');
-      clearInterval(refreshSlider);
-      refreshSlider = setInterval(() => {
-        next.click();
-      }, 5000);
-    }
-
-    dots.forEach((li, key) => {
-      li.addEventListener('click', function () {
-        active = key;
-        reloadSlider();
-      });
-    });
-
-    reloadSlider(); // Ensure initial state is correct
-</script>
-<script>
-    // Get modal elements
-    var modal = document.getElementById("videoModal");
-    var videoFrame = document.getElementById("videoFrame");
-    var span = document.getElementsByClassName("close")[0];
-
-    // Add event listeners to "Xem trailer" buttons
-    var trailerButtons = document.querySelectorAll(".watch-trailer");
-    trailerButtons.forEach(function(button) {
-      button.addEventListener("click", function(event) {
-        event.preventDefault();
-        var videoId = this.getAttribute("data-video-id");
-        var videoUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
-
-        // Reset iframe src
-        videoFrame.src = "";
-
-        // Set iframe src to video URL and display modal
-        videoFrame.src = videoUrl;
-        modal.style.display = "block";
-      });
-    });
-
-    // Close the modal
-    span.onclick = function() {
-      modal.style.display = "none";
-      videoFrame.src = "";
-    }
-
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-        videoFrame.src = "";
-      }
-    }
-
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var videoModal = document.getElementById('videoModal');
-        var videoFrame = document.getElementById('videoFrame');
-        var videoClose = document.querySelector('.video-close');
-
-        var consentModal = document.getElementById('consentModal');
-        var consentClose = document.querySelector('.consent-close');
-        var acceptCookies = document.getElementById('acceptCookies');
-        var declineCookies = document.getElementById('declineCookies');
-
-        // Function to show video modal
-        function showModal(videoUrl) {
-            videoFrame.src = videoUrl;
-            videoModal.style.display = 'flex';
-        }
-
-        // Function to close video modal
-        videoClose.onclick = function() {
-            videoModal.style.display = 'none';
-            videoFrame.src = '';
-        }
-
-        // Function to close consent modal
-        consentClose.onclick = function() {
-            consentModal.style.display = 'none';
-        }
-
-        // Check if consent was already given
-        if (!localStorage.getItem('cookiesAccepted')) {
-            consentModal.style.display = 'flex';
-        }
-
-        // Handle cookie consent actions
-        acceptCookies.onclick = function() {
-            localStorage.setItem('cookiesAccepted', 'true');
-            consentModal.style.display = 'none';
-        }
-
-        declineCookies.onclick = function() {
-            consentModal.style.display = 'none';
-        }
-
-        // Close video modal when clicking outside the modal
-        window.onclick = function(event) {
-            if (event.target == videoModal) {
-                videoModal.style.display = 'none';
-                videoFrame.src = '';
-            }
-            if (event.target == consentModal) {
-                consentModal.style.display = 'none';
-            }
-        }
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const taskList = document.querySelectorAll('.task-list li');
-
-    taskList.forEach(function (item) {
-      item.addEventListener('click', function () {
-        // Remove active class from all items
-        taskList.forEach(function (li) {
-          li.classList.remove('page-active');
-        });
-        // Add active class to the clicked item
-        this.classList.add('page-active');
-
-        // Navigate to the corresponding page
-        const url = this.getAttribute('data-url');
-        if (url) {
-          window.location.href = url;
-        }
-      });
-    });
-  });
-</script>
 </body>
 </html>

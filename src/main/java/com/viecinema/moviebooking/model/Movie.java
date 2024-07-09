@@ -1,15 +1,22 @@
 package com.viecinema.moviebooking.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
-@Table(name="movie")
+@Table(name = "movies", indexes = {
+        @Index(name = "title_index", columnList = "title"),
+        @Index(name = "tmdb_id_index", columnList = "tmdb_id")
+})
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,4 +46,7 @@ public class Movie {
 
     @Column(name = "original_language")
     private String originalLanguage;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MovieGenre> movieGenres = new HashSet<>();
 }

@@ -54,7 +54,7 @@ public class ScreenAPIController {
     @GetMapping("/theater/{theaterId}")
     public ResponseEntity<List<Screen>> getScreensByTheater(@PathVariable Integer theaterId) {
         Theater theater = new Theater();
-        theater.setTheaterId(Long.valueOf(theaterId));
+        theater.setTheaterId(theaterId);
         return ResponseEntity.ok(screenService.getScreensByTheater(theater));
     }
 }
