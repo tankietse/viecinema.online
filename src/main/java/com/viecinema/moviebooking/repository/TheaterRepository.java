@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface TheaterRepository extends JpaRepository<Theater, Integer> {
     Optional<Theater> findByTheaterName(String theaterName);
+    boolean existsByTheaterName(String theaterName);
     List<Theater> findByCity(String city);
     List<Theater> findByCapacityGreaterThanEqual(Integer capacity);
     List<Theater> findByCapacityLessThanEqual(Integer capacity);

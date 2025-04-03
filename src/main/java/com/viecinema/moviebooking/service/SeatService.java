@@ -15,4 +15,8 @@ public class SeatService {
     public Optional<Seat> getSeatsByScreenId(int screenId) {
         return seatRepository.findById(screenId);
     }
+    
+    public Seat save(Seat seat) {
+        return seatRepository.save(seat);
+    }
 }

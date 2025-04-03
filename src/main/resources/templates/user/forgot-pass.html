@@ -3,43 +3,191 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập tài khoản của bạn</title>
-    <link rel="icon" type="image/svg+xml"  th:href="@{/static/img/Vie.svg}" />
-    <link rel="stylesheet" type="text/css"  th:href="@{/static/css/login.css}">
+    <title>Quên mật khẩu</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/static/img/Vie.svg}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/login.css}">
+    <style>
+        .reset-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .reset-form h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+        
+        .input-place {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .reset-info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #c71212;
+        }
+        
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-to-login a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body>
 <section class="app">
-    <div class="container" style="height: 65%;">
-        <div class="login-form">
-            <h1>Quên mật khẩu</h1>
-
-            <form  th:action="@{/forgot-pass}" method="POST">
-                <!-- <div  if="param.error">
-                    <p class="error-message">Tên đăng nhập hoặc mật khẩu không đúng.</p>
-                </div> -->
-                <div style="position: relative; width: 100%;">
-                    <input type="text" id="username" name="username" placeholder="Email" autocomplete="username" required>
-                    <!-- <img id="toggle-password"  src="/img/user-profile 1.png" class="position-absolute top-50 start-100 translate-middle">                     -->
-                </div> 
-                <button type="submit" class="btn-login" style="width: 100%;">Cấp lại mật khẩu</button>
-            </form>
-
-            <div class="login-with-others">
-                <hr>
-                <p><strong>Đăng nhập bằng</strong> phương thức khác:</p>
-                <a class="google-btn"  href="#" target="_blank">
-                    <img  th:src="@{/static/img/google-logo.png}" alt="Google">
-                    <span>Tiếp tục với Google</span>
-                </a>
-                <br>
-                <a class="facebook-btn"  href="#" target="_blank">
-                    <img  th:src="@{/static/img/facebook-logo.png}" alt="Facebook">
-                    <span>Tiếp tục với  Facebook</span>
-                </a>
+    <div class="container">
+        <div class="reset-form">
+            <h1>QUÊN MẬT KHẨU</h1>
+            
+            <div class="reset-info">
+                <p>Vui lòng nhập email hoặc số điện thoại đã đăng ký. Chúng tôi sẽ gửi mã xác nhận đến bạn.</p>
+            </div>
+            
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <div th:if="${error}" class="alert alert-danger">
+                <p th:text="${error}"></p>
+            </div>
+            
+            <!-- Hiển thị thông báo thành công nếu có -->
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+            
+            <!-- Step 1: Form nhập email hoặc số điện thoại -->
+            <div th:if="${step == null || step == 1}">
+                <form th:action="@{/forgot-pass}" method="POST">
+                    <input type="hidden" name="step" value="1">
+                    <div style="position: relative; width: 100%;" class="input-place">
+                        <label for="email"></label>
+                        <input type="email" id="email" name="email" placeholder="Email đã đăng ký" autocomplete="email" required>
+                        <img th:src="@{/static/img/email-icon.png}"
+                            class="position-absolute top-50 start-100 translate-middle"
+                            alt="">
+                    </div>
+                    <button type="submit" class="btn-submit">Gửi mã xác nhận</button>
+                </form>
+            </div>
+            
+            <!-- Step 2: Form nhập mã xác nhận -->
+            <div th:if="${step != null && step == 2}">
+                <form th:action="@{/forgot-pass}" method="POST">
+                    <input type="hidden" name="step" value="2">
+                    <input type="hidden" name="email" th:value="${email}">
+                    
+                    <div style="position: relative; width: 100%;" class="input-place">
+                        <label for="verificationCode"></label>
+                        <input type="text" id="verificationCode" name="verificationCode" placeholder="Mã xác nhận" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Xác nhận</button>
+                </form>
+            </div>
+            
+            <!-- Step 3: Form đặt lại mật khẩu -->
+            <div th:if="${step != null && step == 3}">
+                <form th:action="@{/forgot-pass}" method="POST">
+                    <input type="hidden" name="step" value="3">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <input type="hidden" name="token" th:value="${token}">
+                    
+                    <div style="position: relative; width: 100%;" class="input-place">
+                        <label for="newPassword"></label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Mật khẩu mới" required>
+                        <img th:src="@{/static/img/eye-password-hide.svg}"
+                            class="position-absolute top-50 start-100 translate-middle toggle-password"
+                            alt="">
+                    </div>
+                    
+                    <div style="position: relative; width: 100%;" class="input-place">
+                        <label for="confirmPassword"></label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required>
+                        <img th:src="@{/static/img/eye-password-hide.svg}"
+                            class="position-absolute top-50 start-100 translate-middle toggle-password"
+                            alt="">
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Đặt lại mật khẩu</button>
+                </form>
+            </div>
+            
+            <div class="back-to-login">
+                <a th:href="@{/login}">Quay lại đăng nhập</a>
             </div>
         </div>
     </div>
-
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(function() {
+            const alerts = document.getElementsByClassName('alert');
+            for (let i = 0; i < alerts.length; i++) {
+                alerts[i].style.display = 'none';
+            }
+        }, 5000);
+        
+        // Cho phép hiển thị/ẩn mật khẩu
+        const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+        
+        togglePasswordBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const passwordField = this.previousElementSibling;
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    this.src = '[[@{/static/img/eye-outline.svg}]]';
+                } else {
+                    passwordField.type = 'password';
+                    this.src = '[[@{/static/img/eye-password-hide.svg}]]';
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Quản lý loại phòng chiếu - Vie Cinema</title>
+    <style>
+        .badge-premium {
+            background-color: #7c4dff;
+            color: white;
+        }
+        .badge-standard {
+            background-color: #4db6ac;
+            color: white;
+        }
+        .badge-vip {
+            background-color: #ffc107;
+            color: black;
+        }
+        .feature-icon {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="header-action">
+            <h2 class="mb-4">Quản lý loại phòng chiếu</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScreenTypeModal">
+                <i class="fas fa-plus-circle me-2"></i> Thêm loại phòng chiếu mới
+            </button>
+        </div>
+
+        <!-- Hiển thị thông báo -->
+        <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success}" th:text="${success}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}" th:text="${error}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Bảng danh sách loại phòng chiếu -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-film me-2"></i> Danh sách loại phòng chiếu</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên loại</th>
+                            <th>Giá</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${screenTypes.empty}">
+                            <td colspan="4" class="text-center">Không có loại phòng chiếu nào</td>
+                        </tr>
+                        <tr th:each="screenType : ${screenTypes}">
+                            <td th:text="${screenType.screenTypeId}">1</td>
+                            <td>
+                                <span th:text="${screenType.typeName}" 
+                                      th:class="${'badge rounded-pill ' + 
+                                      (screenType.typeName == 'VIP' ? 'badge-vip' : 
+                                      (screenType.typeName == 'Premium' ? 'badge-premium' : 'badge-standard'))}">
+                                    IMAX
+                                </span>
+                            </td>
+                            <td th:text="${screenType.screenPrice}"></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        th:data-id="${screenType.screenTypeId}"
+                                        th:data-name="${screenType.typeName}"
+                                        th:data-price="${screenType.screenPrice}"
+                                        data-bs-toggle="modal" data-bs-target="#editScreenTypeModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger ms-1" 
+                                        th:onclick="'deleteScreenType(' + ${screenType.screenTypeId} + ')'">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Thêm loại phòng chiếu mới -->
+        <div class="modal fade" id="addScreenTypeModal" tabindex="-1" aria-labelledby="addScreenTypeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addScreenTypeModalLabel">Thêm loại phòng chiếu mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/admin/screen-types/create}" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="typeName" class="form-label">Tên loại phòng</label>
+                                <input type="text" class="form-control" id="typeName" name="typeName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="screenPrice" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="screenPrice" name="screenPrice" min="0" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Thêm mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Sửa loại phòng chiếu -->
+        <div class="modal fade" id="editScreenTypeModal" tabindex="-1" aria-labelledby="editScreenTypeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editScreenTypeModalLabel">Cập nhật loại phòng chiếu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/admin/screen-types/update}" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" id="editScreenTypeId" name="screenTypeId">
+                            <div class="mb-3">
+                                <label for="editTypeName" class="form-label">Tên loại phòng</label>
+                                <input type="text" class="form-control" id="editTypeName" name="typeName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editScreenPrice" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="editScreenPrice" name="screenPrice" min="0" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Cập nhật dữ liệu modal khi hiển thị
+            document.addEventListener('DOMContentLoaded', function() {
+                const editScreenTypeModal = document.getElementById('editScreenTypeModal');
+                if (editScreenTypeModal) {
+                    editScreenTypeModal.addEventListener('show.bs.modal', function (event) {
+                        const button = event.relatedTarget;
+                        const id = button.getAttribute('data-id');
+                        const name = button.getAttribute('data-name');
+                        const price = button.getAttribute('data-price');
+
+                        const modal = this;
+                        modal.querySelector('#editScreenTypeId').value = id;
+                        modal.querySelector('#editTypeName').value = name;
+                        modal.querySelector('#editScreenPrice').value = price;
+                    });
+                }
+            });
+
+            // Xóa loại phòng chiếu
+            function deleteScreenType(id) {
+                Swal.fire({
+                    title: 'Xác nhận xóa',
+                    text: 'Bạn có chắc chắn muốn xóa loại phòng chiếu này không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Xác nhận xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/admin/screen-types/delete/' + id, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                Swal.fire(
+                                    'Đã xóa!',
+                                    'Loại phòng chiếu đã được xóa thành công.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                return response.text().then(text => {
+                                    throw new Error(text || 'Có lỗi xảy ra khi xóa loại phòng chiếu');
+                                });
+                            }
+                        }).catch(error => {
+                            Swal.fire(
+                                'Lỗi!',
+                                error.message,
+                                'error'
+                            );
+                        });
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

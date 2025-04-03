@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vie Cinema: Lịch sử đặt vé</title>
+    <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
+    <style>
+        .booking-history-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .booking-history-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #ff7b00;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .booking-filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background-color: #ff7b00;
+            color: white;
+            border-color: #ff7b00;
+        }
+        
+        .search-box {
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 250px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+        }
+        
+        .booking-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .booking-card-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .booking-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        
+        .status-upcoming {
+            background-color: #e6f0ff;
+            color: #007bff;
+        }
+        
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+        
+        .booking-card-body {
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .movie-poster {
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .booking-info {
+            flex: 1;
+        }
+        
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .booking-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .details-btn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .details-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .cancel-btn {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #ffd5d9;
+        }
+        
+        .qr-code-btn {
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        
+        .qr-code-btn:hover {
+            background-color: #d4f3d4;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+        
+        .page-item {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-item.active {
+            background-color: #ff7b00;
+            color: white;
+            border-color: #ff7b00;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+        }
+        
+        .empty-state img {
+            width: 150px;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .booking-filters {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .booking-card-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include layout -->
+    <section layout:fragment="content">
+        <div class="main-container custom-scrollbar">
+            <div class="booking-history-container">
+                <h1 class="booking-history-title">Lịch sử đặt vé</h1>
+                
+                <div class="booking-filters">
+                    <div class="filter-group">
+                        <div class="filter-btn active">Tất cả</div>
+                        <div class="filter-btn">Sắp tới</div>
+                        <div class="filter-btn">Đã hoàn thành</div>
+                        <div class="filter-btn">Đã hủy</div>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm theo tên phim...">
+                        <span class="material-symbols-outlined">search</span>
+                    </div>
+                </div>
+                
+                <!-- Booking list -->
+                <div class="booking-list">
+                    <!-- Booking cards will be generated from database using Thymeleaf -->
+                    <div th:if="${bookings != null and not #lists.isEmpty(bookings)}" class="booking-results">
+                        <div th:each="booking : ${bookings}" class="booking-card">
+                            <div class="booking-card-header">
+                                <div>
+                                    <span>Mã đặt vé: </span>
+                                    <strong th:text="${booking.bookingCode}">VIE-12345</strong>
+                                </div>
+                                <div class="booking-status" th:classappend="${booking.status == 'COMPLETED' ? 'status-completed' : (booking.status == 'UPCOMING' ? 'status-upcoming' : 'status-cancelled')}"
+                                     th:text="${booking.status == 'COMPLETED' ? 'Đã hoàn thành' : (booking.status == 'UPCOMING' ? 'Sắp tới' : 'Đã hủy')}">Sắp tới</div>
+                            </div>
+                            <div class="booking-card-body">
+                                <img class="movie-poster lazyload" 
+                                     th:data-src="'https://image.tmdb.org/t/p/w500' + ${booking.movie.posterPath}" 
+                                     th:src="@{/static/img/placeholder.png}" 
+                                     th:alt="${booking.movie.title}">
+                                <div class="booking-info">
+                                    <h3 class="movie-title" th:text="${booking.movie.title}">Tên phim</h3>
+                                    <div class="booking-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Rạp: </span>
+                                            <span th:text="${booking.theater.name}">Vie Cinema Quận 1</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Phòng: </span>
+                                            <span th:text="${booking.room}">Phòng 3</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Ngày chiếu: </span>
+                                            <span th:text="${#temporals.format(booking.showTime, 'dd/MM/yyyy')}">20/12/2023</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Giờ chiếu: </span>
+                                            <span th:text="${#temporals.format(booking.showTime, 'HH:mm')}">20:30</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Ghế: </span>
+                                            <span th:text="${booking.seats}">A1, A2</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Tổng tiền: </span>
+                                            <span th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">180,000 VNĐ</span>
+                                        </div>
+                                    </div>
+                                    <div class="booking-actions">
+                                        <a th:href="@{/booking-details(id=${booking.id})}" class="booking-btn details-btn">Xem chi tiết</a>
+                                        <a th:if="${booking.status == 'UPCOMING'}" th:href="@{/cancel-booking(id=${booking.id})}" class="booking-btn cancel-btn">Hủy vé</a>
+                                        <a th:if="${booking.status != 'CANCELLED'}" th:href="@{/booking-qr(id=${booking.id})}" class="booking-btn qr-code-btn">Mã QR</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty state when no bookings found -->
+                    <div th:if="${bookings == null or #lists.isEmpty(bookings)}" class="empty-state">
+                        <img th:src="@{/static/img/empty-ticket.png}" alt="No bookings">
+                        <h3>Bạn chưa có lịch sử đặt vé nào</h3>
+                        <p>Hãy khám phá danh sách phim và đặt vé ngay!</p>
+                        <a th:href="@{/now-playing}" class="booking-btn qr-code-btn" style="display: inline-block; margin-top: 15px;">Xem phim đang chiếu</a>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div th:if="${bookings != null and not #lists.isEmpty(bookings) and totalPages > 1}" class="pagination">
+                    <a class="page-item" th:if="${currentPage > 0}" th:href="@{/booking-history(page=${currentPage - 1})}">«</a>
+                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                        <a class="page-item" th:classappend="${currentPage == i ? 'active' : ''}" th:href="@{/booking-history(page=${i})}" th:text="${i + 1}">1</a>
+                    </span>
+                    <a class="page-item" th:if="${currentPage < totalPages - 1}" th:href="@{/booking-history(page=${currentPage + 1})}">»</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

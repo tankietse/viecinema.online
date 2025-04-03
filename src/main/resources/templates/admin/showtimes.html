@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý Lịch Chiếu</title>
+    <style>
+        .movie-poster {
+            width: 50px;
+            height: 75px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .movie-info {
+            display: flex;
+            align-items: center;
+        }
+        .movie-title {
+            font-weight: 500;
+        }
+        .theater-name {
+            font-weight: 500;
+        }
+        .screen-info {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .showtime-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .showtime-details {
+            margin-left: 60px;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý Lịch Chiếu</h1>
+        <a th:href="@{/admin/showtimes/create}" class="btn btn-primary">
+            <i class="fas fa-plus mr-1"></i> Tạo lịch chiếu mới
+        </a>
+    </div>
+    
+    <p class="mb-4">Quản lý lịch chiếu phim trong hệ thống Vie Cinema. Bạn có thể thêm, sửa, xóa lịch chiếu và xem tình trạng đặt vé.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bộ lọc lịch chiếu -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bộ lọc lịch chiếu</h6>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/showtimes}" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="movieFilter" class="form-label">Phim</label>
+                    <select class="form-select" id="movieFilter" name="movieId">
+                        <option value="">Tất cả phim</option>
+                        <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}" th:selected="${param.movieId == movie.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="theaterFilter" class="form-label">Rạp chiếu</label>
+                    <select class="form-select" id="theaterFilter" name="theaterId">
+                        <option value="">Tất cả rạp</option>
+                        <option th:each="theater : ${theaters}" th:value="${theater.theaterId}" th:text="${theater.name}" th:selected="${param.theaterId == theater.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="startDate" class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" th:value="${param.startDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="endDate" class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" th:value="${param.endDate}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search mr-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bảng lịch chiếu -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách lịch chiếu</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="showtimesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="25%">Phim</th>
+                            <th width="20%">Rạp & Phòng chiếu</th>
+                            <th>Ngày chiếu</th>
+                            <th>Giờ chiếu</th>
+                            <th>Tình trạng vé</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="showtime : ${showtimes}">
+                            <td>
+                                <div class="movie-info">
+                                    <img th:src="${showtime.movie.posterUrl}" class="movie-poster" alt="Movie Poster">
+                                    <div>
+                                        <div class="movie-title" th:text="${showtime.movie.title}">Tên phim</div>
+                                        <div th:text="${showtime.movie.duration + ' phút'}">120 phút</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="theater-name" th:text="${showtime.theater.name}">Vie Cinema Vincom Center</div>
+                                <div class="screen-info" th:text="'Phòng ' + ${showtime.screen.name}">Phòng Cinema 1</div>
+                                <div class="screen-info" th:text="${showtime.screen.format}">2D</div>
+                            </td>
+                            <td th:text="${#temporals.format(showtime.showDate, 'dd/MM/yyyy')}">01/01/2023</td>
+                            <td>
+                                <span th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">20:00</span> - 
+                                <span th:text="${#temporals.format(showtime.endTime, 'HH:mm')}">22:00</span>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" th:style="'width: ' + ${showtime.bookedPercentage} + '%'" th:text="${showtime.bookedPercentage} + '%'" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                </div>
+                                <div class="showtime-details" th:text="${showtime.bookedSeats} + '/' + ${showtime.totalSeats} + ' chỗ đã đặt'">25/100 chỗ đã đặt</div>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${showtime.status == 'UPCOMING' ? 'bg-warning' : (showtime.status == 'OPEN' ? 'bg-success' : (showtime.status == 'FULL' ? 'bg-danger' : 'bg-secondary'))}"
+                                      th:text="${showtime.status == 'UPCOMING' ? 'Sắp diễn ra' : (showtime.status == 'OPEN' ? 'Đang bán vé' : (showtime.status == 'FULL' ? 'Hết vé' : 'Đã chiếu'))}">Trạng thái</span>
+                            </td>
+                            <td>
+                                <div class="showtime-actions">
+                                    <a th:href="@{/admin/showtimes/{id}/edit(id=${showtime.id})}" class="btn btn-sm btn-info" title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteShowtime(this)" th:attr="data-id=${showtime.id}" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <a th:href="@{/admin/showtimes/{id}/seats(id=${showtime.id})}" class="btn btn-sm btn-secondary" title="Sơ đồ ghế">
+                                        <i class="fas fa-chair"></i>
+                                    </a>
+                                    <a th:href="@{/admin/showtimes/{id}/bookings(id=${showtime.id})}" class="btn btn-sm btn-primary" title="Danh sách vé">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(showtimes)}">
+                            <td colspan="7" class="text-center">Không có dữ liệu lịch chiếu</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Phân trang -->
+            <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/showtimes(page=${currentPage - 1}, movieId=${param.movieId}, theaterId=${param.theaterId}, startDate=${param.startDate}, endDate=${param.endDate})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/admin/showtimes(page=${i}, movieId=${param.movieId}, theaterId=${param.theaterId}, startDate=${param.startDate}, endDate=${param.endDate})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/showtimes(page=${currentPage + 1}, movieId=${param.movieId}, theaterId=${param.theaterId}, startDate=${param.startDate}, endDate=${param.endDate})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deleteShowtimeModal" tabindex="-1" aria-labelledby="deleteShowtimeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteShowtimeModalLabel">Xác nhận xóa lịch chiếu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa lịch chiếu này? Hành động này không thể hoàn tác.</p>
+                    <p class="text-danger">Lưu ý: Tất cả vé đã đặt cho suất chiếu này sẽ bị hủy.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="showtimeIdToDelete">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteShowtime()">Xác nhận xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Xác nhận xóa lịch chiếu
+        function confirmDeleteShowtime(button) {
+            const showtimeId = button.getAttribute('data-id');
+            document.getElementById('showtimeIdToDelete').value = showtimeId;
+            
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteShowtimeModal'));
+            deleteModal.show();
+        }
+        
+        // Xóa lịch chiếu
+        function deleteShowtime() {
+            const showtimeId = document.getElementById('showtimeIdToDelete').value;
+            
+            fetch(`/admin/showtimes/delete/${showtimeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    throw new Error('Có lỗi xảy ra khi xóa lịch chiếu.');
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+                console.error('Error:', error);
+            });
+        }
+
+        // Tự động điền giá trị ngày nếu trống
+        document.addEventListener('DOMContentLoaded', function() {
+            // Nếu không có startDate, đặt mặc định là ngày hôm nay
+            if (!document.getElementById('startDate').value) {
+                const today = new Date();
+                document.getElementById('startDate').value = today.toISOString().split('T')[0];
+            }
+            
+            // Nếu không có endDate, đặt mặc định là 7 ngày sau ngày bắt đầu
+            if (!document.getElementById('endDate').value) {
+                const startDate = new Date(document.getElementById('startDate').value);
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 7);
+                document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

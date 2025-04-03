@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý Giá Vé Đặc Biệt</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .promo-card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        .promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1.5rem 0 rgba(58, 59, 69, 0.25);
+        }
+        .promo-header {
+            padding: 1rem;
+            color: white;
+            position: relative;
+        }
+        .promo-active {
+            background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+        }
+        .promo-inactive {
+            background: linear-gradient(135deg, #546e7a 0%, #78909c 100%);
+        }
+        .promo-upcoming {
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+        }
+        .promo-expired {
+            background: linear-gradient(135deg, #e53935 0%, #ef5350 100%);
+        }
+        .promo-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            border-radius: 50px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .promo-body {
+            padding: 1.5rem;
+        }
+        .promo-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        .discount-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .promo-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .promo-code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .filter-bar {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .tag-movies {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .tag-screens {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        .tag-time {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        .tag-customer {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .flatpickr-input {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý Giá Vé Đặc Biệt</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPromotionModal">
+            <i class="fas fa-plus mr-1"></i> Thêm khuyến mãi mới
+        </button>
+    </div>
+    
+    <p class="mb-4">Quản lý các chương trình giá vé đặc biệt, khuyến mãi và mã giảm giá trong hệ thống Vie Cinema.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    <!-- Tabs điều hướng cho các phần giá vé -->
+    <ul class="nav nav-tabs mb-4" id="pricingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" href="/admin/pricing">
+                Giá vé cơ bản
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" href="/admin/pricing/special">
+                Giá vé đặc biệt
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Bộ lọc -->
+    <div class="filter-bar">
+        <form action="/admin/pricing/special" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="statusFilter" class="form-label">Trạng thái</label>
+                <select class="form-select form-select-sm" id="statusFilter" name="status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="ACTIVE" th:selected="${param.status == 'ACTIVE'}">Đang áp dụng</option>
+                    <option value="INACTIVE" th:selected="${param.status == 'INACTIVE'}">Không áp dụng</option>
+                    <option value="UPCOMING" th:selected="${param.status == 'UPCOMING'}">Sắp tới</option>
+                    <option value="EXPIRED" th:selected="${param.status == 'EXPIRED'}">Đã hết hạn</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="typeFilter" class="form-label">Loại khuyến mãi</label>
+                <select class="form-select form-select-sm" id="typeFilter" name="type">
+                    <option value="">Tất cả loại</option>
+                    <option value="PERCENTAGE" th:selected="${param.type == 'PERCENTAGE'}">Giảm theo phần trăm</option>
+                    <option value="FIXED_AMOUNT" th:selected="${param.type == 'FIXED_AMOUNT'}">Giảm theo số tiền</option>
+                    <option value="SPECIAL_PRICE" th:selected="${param.type == 'SPECIAL_PRICE'}">Giá cố định</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="searchInput" class="form-label">Tìm kiếm</label>
+                <input type="text" class="form-control form-control-sm" id="searchInput" name="search" th:value="${param.search}" placeholder="Tên khuyến mãi, mã...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label d-block">&nbsp;</label>
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-search me-1"></i> Tìm kiếm
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Các khuyến mãi đang áp dụng -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Khuyến mãi đang áp dụng</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Khuyến mãi 1 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card promo-card h-100">
+                        <div class="promo-header promo-active">
+                            <h5 class="mb-0">Giảm 20% cuối tuần</h5>
+                            <span class="promo-badge">Đang áp dụng</span>
+                        </div>
+                        <div class="promo-body">
+                            <div class="promo-date">
+                                <i class="far fa-calendar-alt me-1"></i> 01/05/2025 - 30/06/2025
+                            </div>
+                            <div class="mb-3">
+                                <span class="discount-amount">-20%</span>
+                                <span class="text-muted"> cho tất cả vé</span>
+                            </div>
+                            <div>
+                                <p class="mb-2">Mã khuyến mãi: <span class="promo-code">WEEKEND20</span></p>
+                                <div class="mb-3">
+                                    <span class="tag tag-time">Cuối tuần</span>
+                                    <span class="tag tag-movies">Tất cả phim</span>
+                                    <span class="tag tag-screens">Tất cả phòng</span>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    Giảm 20% giá vé cuối tuần (thứ 7, chủ nhật) cho mọi khách hàng. Áp dụng với tất cả loại phòng chiếu và phim.
+                                </p>
+                                <div class="promo-actions">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="1">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(1, 'Giảm 20% cuối tuần')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="togglePromoStatus(1, false)">
+                                        <i class="fas fa-pause"></i> Tạm ngừng
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="1">
+                                        Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khuyến mãi 2 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card promo-card h-100">
+                        <div class="promo-header promo-active">
+                            <h5 class="mb-0">Sinh viên giảm 30%</h5>
+                            <span class="promo-badge">Đang áp dụng</span>
+                        </div>
+                        <div class="promo-body">
+                            <div class="promo-date">
+                                <i class="far fa-calendar-alt me-1"></i> 01/01/2025 - 31/12/2025
+                            </div>
+                            <div class="mb-3">
+                                <span class="discount-amount">-30%</span>
+                                <span class="text-muted"> cho sinh viên</span>
+                            </div>
+                            <div>
+                                <p class="mb-2">Mã khuyến mãi: <span class="promo-code">STUDENT30</span></p>
+                                <div class="mb-3">
+                                    <span class="tag tag-customer">Sinh viên</span>
+                                    <span class="tag tag-time">Thứ 2-5</span>
+                                    <span class="tag tag-screens">Tất cả phòng</span>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    Giảm 30% giá vé cho sinh viên vào các ngày thường (thứ 2 đến thứ 5). Yêu cầu xuất trình thẻ sinh viên.
+                                </p>
+                                <div class="promo-actions">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(2, 'Sinh viên giảm 30%')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="togglePromoStatus(2, false)">
+                                        <i class="fas fa-pause"></i> Tạm ngừng
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="2">
+                                        Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Khuyến mãi 3 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card promo-card h-100">
+                        <div class="promo-header promo-active">
+                            <h5 class="mb-0">Happy Hour (10h-14h)</h5>
+                            <span class="promo-badge">Đang áp dụng</span>
+                        </div>
+                        <div class="promo-body">
+                            <div class="promo-date">
+                                <i class="far fa-calendar-alt me-1"></i> 01/04/2025 - 30/09/2025
+                            </div>
+                            <div class="mb-3">
+                                <span class="discount-amount">-25%</span>
+                                <span class="text-muted"> mỗi ngày</span>
+                            </div>
+                            <div>
+                                <p class="mb-2">Mã khuyến mãi: <span class="promo-code">HAPPY25</span></p>
+                                <div class="mb-3">
+                                    <span class="tag tag-time">10h-14h</span>
+                                    <span class="tag tag-customer">Tất cả KH</span>
+                                    <span class="tag tag-screens">Standard</span>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    Giảm 25% giá vé cho các suất chiếu từ 10h đến 14h hàng ngày, áp dụng cho phòng chiếu standard.
+                                </p>
+                                <div class="promo-actions">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(3, 'Happy Hour (10h-14h)')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="togglePromoStatus(3, false)">
+                                        <i class="fas fa-pause"></i> Tạm ngừng
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="3">
+                                        Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Các khuyến mãi sắp diễn ra -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Khuyến mãi sắp diễn ra</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Khuyến mãi sắp tới 1 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card promo-card h-100">
+                        <div class="promo-header promo-upcoming">
+                            <h5 class="mb-0">Kỷ niệm 5 năm</h5>
+                            <span class="promo-badge">Sắp diễn ra</span>
+                        </div>
+                        <div class="promo-body">
+                            <div class="promo-date">
+                                <i class="far fa-calendar-alt me-1"></i> 01/08/2025 - 15/08/2025
+                            </div>
+                            <div class="mb-3">
+                                <span class="discount-amount">-50%</span>
+                                <span class="text-muted"> cho tất cả vé</span>
+                            </div>
+                            <div>
+                                <p class="mb-2">Mã khuyến mãi: <span class="promo-code">ANNIV5</span></p>
+                                <div class="mb-3">
+                                    <span class="tag tag-time">Cả ngày</span>
+                                    <span class="tag tag-movies">Tất cả phim</span>
+                                    <span class="tag tag-customer">Tất cả KH</span>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    Mừng kỷ niệm 5 năm thành lập, giảm 50% giá vé cho tất cả khách hàng, áp dụng mọi rạp và phim.
+                                </p>
+                                <div class="promo-actions">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="4">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(4, 'Kỷ niệm 5 năm')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-success" onclick="togglePromoStatus(4, true)">
+                                        <i class="fas fa-play"></i> Kích hoạt
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="4">
+                                        Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Các khuyến mãi đã hết hạn hoặc tắt -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Khuyến mãi đã hết hạn hoặc tắt</h6>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapsedPromotions" aria-expanded="false">
+                <i class="fas fa-eye"></i> Hiển thị/Ẩn
+            </button>
+        </div>
+        <div class="collapse" id="collapsedPromotions">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Khuyến mãi đã hết hạn -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card promo-card h-100">
+                            <div class="promo-header promo-expired">
+                                <h5 class="mb-0">Khai trương rạp mới</h5>
+                                <span class="promo-badge">Đã hết hạn</span>
+                            </div>
+                            <div class="promo-body">
+                                <div class="promo-date">
+                                    <i class="far fa-calendar-alt me-1"></i> 01/01/2025 - 01/03/2025
+                                </div>
+                                <div class="mb-3">
+                                    <span class="discount-amount">-40%</span>
+                                    <span class="text-muted"> cho tất cả vé</span>
+                                </div>
+                                <div>
+                                    <p class="mb-2">Mã khuyến mãi: <span class="promo-code">NEWTHEATER</span></p>
+                                    <div class="mb-3">
+                                        <span class="tag tag-screens">Rạp Q9</span>
+                                        <span class="tag tag-customer">Tất cả KH</span>
+                                        <span class="tag tag-movies">Tất cả phim</span>
+                                    </div>
+                                    <p class="small text-muted mb-3">
+                                        Giảm 40% giá vé cho tất cả suất chiếu tại rạp mới khai trương tại Quận 9.
+                                    </p>
+                                    <div class="promo-actions">
+                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="5">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(5, 'Khai trương rạp mới')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" onclick="duplicatePromotion(5)">
+                                            <i class="fas fa-copy"></i> Tạo bản sao
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="5">
+                                            Chi tiết
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Khuyến mãi bị tắt -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card promo-card h-100">
+                            <div class="promo-header promo-inactive">
+                                <h5 class="mb-0">Ngày thành viên</h5>
+                                <span class="promo-badge">Không áp dụng</span>
+                            </div>
+                            <div class="promo-body">
+                                <div class="promo-date">
+                                    <i class="far fa-calendar-alt me-1"></i> 01/05/2025 - 31/12/2025
+                                </div>
+                                <div class="mb-3">
+                                    <span class="discount-amount">-35%</span>
+                                    <span class="text-muted"> thành viên VIP</span>
+                                </div>
+                                <div>
+                                    <p class="mb-2">Mã khuyến mãi: <span class="promo-code">MEMBERDAY</span></p>
+                                    <div class="mb-3">
+                                        <span class="tag tag-customer">Thành viên</span>
+                                        <span class="tag tag-time">Thứ 3 hàng tuần</span>
+                                        <span class="tag tag-screens">Tất cả phòng</span>
+                                    </div>
+                                    <p class="small text-muted mb-3">
+                                        Giảm 35% giá vé cho thành viên VIP vào mỗi thứ 3 hàng tuần. Yêu cầu đăng nhập tài khoản.
+                                    </p>
+                                    <div class="promo-actions">
+                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editPromotionModal" data-id="6">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="confirmDeletePromo(6, 'Ngày thành viên')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" onclick="togglePromoStatus(6, true)">
+                                            <i class="fas fa-play"></i> Kích hoạt
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal" data-id="6">
+                                            Chi tiết
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal thêm khuyến mãi mới -->
+    <div class="modal fade" id="addPromotionModal" tabindex="-1" aria-labelledby="addPromotionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPromotionModalLabel">Thêm khuyến mãi mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/special/create}" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="promotionName" class="form-label">Tên khuyến mãi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="promotionName" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="promotionCode" class="form-label">Mã khuyến mãi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="promotionCode" name="code" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="startDate" class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control flatpickr-date" id="startDate" name="startDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="endDate" class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control flatpickr-date" id="endDate" name="endDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="discountType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                                <select class="form-select" id="discountType" name="discountType" required>
+                                    <option value="PERCENTAGE">Giảm theo phần trăm (%)</option>
+                                    <option value="FIXED_AMOUNT">Giảm theo số tiền (VND)</option>
+                                    <option value="SPECIAL_PRICE">Giá cố định (VND)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="discountValue" class="form-label">Giá trị <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="discountValue" name="discountValue" required>
+                                    <span class="input-group-text" id="discountSymbol">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Áp dụng cho phim</label>
+                                <select class="form-select" name="applyToMovies">
+                                    <option value="ALL" selected>Tất cả phim</option>
+                                    <option value="SELECTED">Chọn phim cụ thể</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Áp dụng cho rạp/phòng</label>
+                                <select class="form-select" name="applyToScreens">
+                                    <option value="ALL" selected>Tất cả phòng</option>
+                                    <option value="STANDARD">Chỉ phòng Standard</option>
+                                    <option value="PREMIUM">Chỉ phòng Premium</option>
+                                    <option value="VIP">Chỉ phòng VIP</option>
+                                    <option value="SELECTED">Chọn phòng cụ thể</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Áp dụng theo thời gian</label>
+                                <select class="form-select" name="applyToTimeSlots">
+                                    <option value="ALL" selected>Cả ngày</option>
+                                    <option value="MORNING">Chỉ buổi sáng (trước 12h)</option>
+                                    <option value="AFTERNOON">Chỉ buổi chiều (12h-17h)</option>
+                                    <option value="EVENING">Chỉ buổi tối (sau 17h)</option>
+                                    <option value="WEEKDAY">Chỉ ngày trong tuần (T2-T6)</option>
+                                    <option value="WEEKEND">Chỉ cuối tuần (T7-CN)</option>
+                                    <option value="CUSTOM">Tùy chỉnh</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Áp dụng cho khách hàng</label>
+                                <select class="form-select" name="applyToCustomers">
+                                    <option value="ALL" selected>Tất cả khách hàng</option>
+                                    <option value="MEMBER">Chỉ thành viên</option>
+                                    <option value="VIP">Chỉ thành viên VIP</option>
+                                    <option value="STUDENT">Chỉ học sinh, sinh viên</option>
+                                    <option value="SENIOR">Chỉ người cao tuổi</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="maxUsage" class="form-label">Giới hạn sử dụng</label>
+                                <input type="number" class="form-control" id="maxUsage" name="maxUsage" value="0" min="0">
+                                <small class="form-text text-muted">0 = Không giới hạn</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="maxUsagePerUser" class="form-label">Số lần mỗi KH</label>
+                                <input type="number" class="form-control" id="maxUsagePerUser" name="maxUsagePerUser" value="1" min="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="priority" class="form-label">Độ ưu tiên</label>
+                                <input type="number" class="form-control" id="priority" name="priority" value="1" min="1">
+                                <small class="form-text text-muted">Cao hơn = ưu tiên hơn</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="active" checked>
+                            <label class="form-check-label" for="isActive">Kích hoạt khuyến mãi ngay</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu khuyến mãi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa khuyến mãi -->
+    <div class="modal fade" id="editPromotionModal" tabindex="-1" aria-labelledby="editPromotionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPromotionModalLabel">Chỉnh sửa khuyến mãi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/special/update}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editPromoId" name="id">
+                        <!-- Các trường giống với form thêm mới -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPromotionName" class="form-label">Tên khuyến mãi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editPromotionName" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editPromotionCode" class="form-label">Mã khuyến mãi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editPromotionCode" name="code" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editStartDate" class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control flatpickr-date" id="editStartDate" name="startDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editEndDate" class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control flatpickr-date" id="editEndDate" name="endDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDiscountType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editDiscountType" name="discountType" required>
+                                    <option value="PERCENTAGE">Giảm theo phần trăm (%)</option>
+                                    <option value="FIXED_AMOUNT">Giảm theo số tiền (VND)</option>
+                                    <option value="SPECIAL_PRICE">Giá cố định (VND)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editDiscountValue" class="form-label">Giá trị <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="editDiscountValue" name="discountValue" required>
+                                    <span class="input-group-text" id="editDiscountSymbol">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <!-- Các trường khác giống form thêm mới -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="editMaxUsage" class="form-label">Giới hạn sử dụng</label>
+                                <input type="number" class="form-control" id="editMaxUsage" name="maxUsage" min="0">
+                                <small class="form-text text-muted">0 = Không giới hạn</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editMaxUsagePerUser" class="form-label">Số lần mỗi KH</label>
+                                <input type="number" class="form-control" id="editMaxUsagePerUser" name="maxUsagePerUser" min="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editPriority" class="form-label">Độ ưu tiên</label>
+                                <input type="number" class="form-control" id="editPriority" name="priority" min="1">
+                                <small class="form-text text-muted">Cao hơn = ưu tiên hơn</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="editIsActive" name="active">
+                            <label class="form-check-label" for="editIsActive">Kích hoạt khuyến mãi</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal xem chi tiết -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDetailsModalLabel">Chi tiết khuyến mãi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%">Mã khuyến mãi</th>
+                                <td id="detailCode">WEEKEND20</td>
+                            </tr>
+                            <tr>
+                                <th>Thời gian</th>
+                                <td id="detailDates">01/05/2025 - 30/06/2025</td>
+                            </tr>
+                            <tr>
+                                <th>Giảm giá</th>
+                                <td id="detailDiscount">20%</td>
+                            </tr>
+                            <tr>
+                                <th>Trạng thái</th>
+                                <td id="detailStatus"><span class="badge bg-success">Đang áp dụng</span></td>
+                            </tr>
+                            <tr>
+                                <th>Đã sử dụng</th>
+                                <td id="detailUsage">47 / Không giới hạn</td>
+                            </tr>
+                            <tr>
+                                <th>Áp dụng cho</th>
+                                <td id="detailAppliesTo">
+                                    <span class="tag tag-time">Cuối tuần</span>
+                                    <span class="tag tag-movies">Tất cả phim</span>
+                                    <span class="tag tag-screens">Tất cả phòng</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Mô tả</th>
+                                <td id="detailDescription">Giảm 20% giá vé cuối tuần (thứ 7, chủ nhật) cho mọi khách hàng</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div>
+                        <h6>Thống kê sử dụng</h6>
+                        <canvas id="usageChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deletePromoModal" tabindex="-1" aria-labelledby="deletePromoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePromoModalLabel">Xác nhận xóa khuyến mãi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa khuyến mãi "<span id="promoNameToDelete"></span>"?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Lưu ý: Hành động này không thể hoàn tác!</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="promoIdToDelete">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" onclick="deletePromotion()">Xác nhận xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Khởi tạo Flatpickr cho các trường ngày
+            flatpickr(".flatpickr-date", {
+                locale: "vn",
+                dateFormat: "d/m/Y",
+                allowInput: true
+            });
+            
+            // Xử lý hiển thị đơn vị giảm giá
+            document.getElementById('discountType').addEventListener('change', function() {
+                const symbol = document.getElementById('discountSymbol');
+                if (this.value === 'PERCENTAGE') {
+                    symbol.textContent = '%';
+                } else {
+                    symbol.textContent = 'VND';
+                }
+            });
+            
+            document.getElementById('editDiscountType').addEventListener('change', function() {
+                const symbol = document.getElementById('editDiscountSymbol');
+                if (this.value === 'PERCENTAGE') {
+                    symbol.textContent = '%';
+                } else {
+                    symbol.textContent = 'VND';
+                }
+            });
+            
+            // Xử lý modal xem chi tiết
+            const viewDetailsModal = document.getElementById('viewDetailsModal');
+            viewDetailsModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                
+                // Đây là mã giả - Trong thực tế bạn sẽ gọi API để lấy chi tiết khuyến mãi
+                // Sau đó hiển thị dữ liệu vào các phần tử có sẵn trong modal
+                
+                // Thêm biểu đồ sử dụng
+                const ctx = document.getElementById('usageChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                        datasets: [{
+                            label: 'Số lần sử dụng',
+                            data: [5, 7, 3, 8, 10, 7, 12],
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Xử lý modal chỉnh sửa
+            const editPromotionModal = document.getElementById('editPromotionModal');
+            editPromotionModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                
+                // Đây là mã giả - Trong thực tế bạn sẽ gọi API để lấy chi tiết khuyến mãi
+                document.getElementById('editPromoId').value = id;
+                
+                // Giả sử dữ liệu cho khuyến mãi ID 1
+                if (id == '1') {
+                    document.getElementById('editPromotionName').value = 'Giảm 20% cuối tuần';
+                    document.getElementById('editPromotionCode').value = 'WEEKEND20';
+                    document.getElementById('editStartDate').value = '01/05/2025';
+                    document.getElementById('editEndDate').value = '30/06/2025';
+                    document.getElementById('editDiscountType').value = 'PERCENTAGE';
+                    document.getElementById('editDiscountValue').value = '20';
+                    document.getElementById('editDescription').value = 'Giảm 20% giá vé cuối tuần (thứ 7, chủ nhật) cho mọi khách hàng. Áp dụng với tất cả loại phòng chiếu và phim.';
+                    document.getElementById('editMaxUsage').value = '0';
+                    document.getElementById('editMaxUsagePerUser').value = '1';
+                    document.getElementById('editPriority').value = '1';
+                    document.getElementById('editIsActive').checked = true;
+                    document.getElementById('editDiscountSymbol').textContent = '%';
+                }
+            });
+        });
+        
+        // Xác nhận xóa khuyến mãi
+        function confirmDeletePromo(promoId, promoName) {
+            document.getElementById('promoIdToDelete').value = promoId;
+            document.getElementById('promoNameToDelete').textContent = promoName;
+            
+            const deleteModal = new bootstrap.Modal(document.getElementById('deletePromoModal'));
+            deleteModal.show();
+        }
+        
+        // Thực hiện xóa khuyến mãi
+        function deletePromotion() {
+            const promoId = document.getElementById('promoIdToDelete').value;
+            
+            // Gọi API xóa khuyến mãi
+            fetch('/admin/pricing/special/delete/' + promoId, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi xóa khuyến mãi!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error);
+            });
+        }
+        
+        // Bật/tắt trạng thái khuyến mãi
+        function togglePromoStatus(promoId, status) {
+            fetch('/admin/pricing/special/toggle-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: promoId,
+                    active: status
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi thay đổi trạng thái khuyến mãi!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error);
+            });
+        }
+        
+        // Nhân bản khuyến mãi
+        function duplicatePromotion(promoId) {
+            fetch('/admin/pricing/special/duplicate/' + promoId, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi nhân bản khuyến mãi!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error);
+            });
+        }
+    </script>
+</th:block>
+</body>
+</html>

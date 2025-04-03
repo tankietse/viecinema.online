@@ -13,7 +13,9 @@
         <div class="login-form" style=" min-height: auto;">
             <img th:src="@{static/img/message.png}" style="width: 192px; height: 180px">
             <h1 style="font-size: 25px;">Gửi yêu cầu thành công</h1>
-            <button type="submit" class="btn-login" style="width: 80%;">Tiếp tục đăng nhập</button>
+            <a th:href="@{/login}" style="width: 80%; text-decoration: none;">
+                <button type="button" class="btn-login" style="width: 100%;">Tiếp tục đăng nhập</button>
+            </a>
         </div>
     </div>
 

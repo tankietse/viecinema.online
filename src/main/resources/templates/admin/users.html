@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý người dùng</title>
+    <style>
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .user-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .badge-role {
+            font-size: 0.75rem;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #1cc88a;
+        }
+        .status-inactive {
+            background-color: #e74a3b;
+        }
+        .status-pending {
+            background-color: #f6c23e;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý người dùng</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="fas fa-user-plus mr-1"></i> Thêm người dùng mới
+        </button>
+    </div>
+    
+    <p class="mb-4">Quản lý thông tin người dùng trong hệ thống Vie Cinema. Bạn có thể thêm, sửa, xóa thông tin người dùng và phân quyền.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bộ lọc người dùng -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Tìm kiếm và lọc</h6>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/users}" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="searchInput" class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" id="searchInput" name="search" th:value="${param.search}" placeholder="Tên, email, số điện thoại...">
+                </div>
+                <div class="col-md-2">
+                    <label for="roleFilter" class="form-label">Vai trò</label>
+                    <select class="form-select" id="roleFilter" name="role">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="ROLE_ADMIN" th:selected="${param.role == 'ROLE_ADMIN'}">Quản trị viên</option>
+                        <option value="ROLE_MANAGER" th:selected="${param.role == 'ROLE_MANAGER'}">Quản lý</option>
+                        <option value="ROLE_STAFF" th:selected="${param.role == 'ROLE_STAFF'}">Nhân viên</option>
+                        <option value="ROLE_USER" th:selected="${param.role == 'ROLE_USER'}">Khách hàng</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="statusFilter" class="form-label">Trạng thái</label>
+                    <select class="form-select" id="statusFilter" name="status">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="ACTIVE" th:selected="${param.status == 'ACTIVE'}">Hoạt động</option>
+                        <option value="INACTIVE" th:selected="${param.status == 'INACTIVE'}">Không hoạt động</option>
+                        <option value="PENDING" th:selected="${param.status == 'PENDING'}">Chưa kích hoạt</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sortBy" class="form-label">Sắp xếp theo</label>
+                    <select class="form-select" id="sortBy" name="sort">
+                        <option value="createdAt,desc" th:selected="${param.sort == 'createdAt,desc'}">Mới nhất</option>
+                        <option value="createdAt,asc" th:selected="${param.sort == 'createdAt,asc'}">Cũ nhất</option>
+                        <option value="lastName,asc" th:selected="${param.sort == 'lastName,asc'}">Tên (A-Z)</option>
+                        <option value="lastName,desc" th:selected="${param.sort == 'lastName,desc'}">Tên (Z-A)</option>
+                        <option value="email,asc" th:selected="${param.sort == 'email,asc'}">Email (A-Z)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search mr-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bảng người dùng -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách người dùng</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ảnh đại diện</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>Điện thoại</th>
+                            <th>Vai trò</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}">1</td>
+                            <td>
+                                <img th:if="${user.avatarUrl}" th:src="${user.avatarUrl}" class="user-avatar" alt="Avatar">
+                                <div th:unless="${user.avatarUrl}" class="user-avatar d-flex align-items-center justify-content-center bg-primary text-white">
+                                    <span th:text="${#strings.substring(user.firstName, 0, 1)}">U</span>
+                                </div>
+                            </td>
+                            <td th:text="${user.firstName + ' ' + user.lastName}">Nguyễn Văn A</td>
+                            <td th:text="${user.email}">example@gmail.com</td>
+                            <td th:text="${user.phone}">0123456789</td>
+                            <td>
+                                <span th:if="${user.role == 'ROLE_ADMIN'}" class="badge bg-danger badge-role">Quản trị viên</span>
+                                <span th:if="${user.role == 'ROLE_MANAGER'}" class="badge bg-primary badge-role">Quản lý</span>
+                                <span th:if="${user.role == 'ROLE_STAFF'}" class="badge bg-info badge-role">Nhân viên</span>
+                                <span th:if="${user.role == 'ROLE_USER'}" class="badge bg-secondary badge-role">Khách hàng</span>
+                            </td>
+                            <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy')}">01/01/2023</td>
+                            <td>
+                                <span th:if="${user.status == 'ACTIVE'}" class="d-flex align-items-center">
+                                    <span class="status-dot status-active"></span> Hoạt động
+                                </span>
+                                <span th:if="${user.status == 'INACTIVE'}" class="d-flex align-items-center">
+                                    <span class="status-dot status-inactive"></span> Không hoạt động
+                                </span>
+                                <span th:if="${user.status == 'PENDING'}" class="d-flex align-items-center">
+                                    <span class="status-dot status-pending"></span> Chưa kích hoạt
+                                </span>
+                            </td>
+                            <td>
+                                <div class="user-actions">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                            th:attr="data-id=${user.id}, data-firstname=${user.firstName}, data-lastname=${user.lastName},
+                                                    data-email=${user.email}, data-phone=${user.phone}, data-role=${user.role},
+                                                    data-status=${user.status}, data-avatar=${user.avatarUrl}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button th:if="${user.id != currentUserId}" class="btn btn-sm btn-danger" onclick="confirmDeleteUser(this)" 
+                                            th:attr="data-id=${user.id}, data-name=${user.firstName + ' ' + user.lastName}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <a th:href="@{/admin/users/{id}/reset-password(id=${user.id})}" class="btn btn-sm btn-warning" title="Đặt lại mật khẩu">
+                                        <i class="fas fa-key"></i>
+                                    </a>
+                                    <a th:href="@{/admin/users/{id}/details(id=${user.id})}" class="btn btn-sm btn-secondary" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="9" class="text-center">Không có dữ liệu người dùng</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Phân trang -->
+            <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1}, search=${param.search}, role=${param.role}, status=${param.status}, sort=${param.sort})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/admin/users(page=${i}, search=${param.search}, role=${param.role}, status=${param.status}, sort=${param.sort})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1}, search=${param.search}, role=${param.role}, status=${param.status}, sort=${param.sort})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal thêm người dùng mới -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Thêm người dùng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/users/create}" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Họ</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="birthDate" class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" id="birthDate" name="birthDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Mật khẩu</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label">Vai trò</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="ROLE_USER">Khách hàng</option>
+                                    <option value="ROLE_STAFF">Nhân viên</option>
+                                    <option value="ROLE_MANAGER">Quản lý</option>
+                                    <option value="ROLE_ADMIN">Quản trị viên</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="ACTIVE">Hoạt động</option>
+                                    <option value="INACTIVE">Không hoạt động</option>
+                                    <option value="PENDING">Chưa kích hoạt</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="avatarFile" class="form-label">Ảnh đại diện</label>
+                            <input class="form-control" type="file" id="avatarFile" name="avatarFile" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Tạo người dùng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa người dùng -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Chỉnh sửa thông tin người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/users/update}" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="editUserId" name="id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFirstName" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editLastName" class="form-label">Họ</label>
+                                <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhone" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="editPhone" name="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editBirthDate" class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" id="editBirthDate" name="birthDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editRole" class="form-label">Vai trò</label>
+                                <select class="form-select" id="editRole" name="role" required>
+                                    <option value="ROLE_USER">Khách hàng</option>
+                                    <option value="ROLE_STAFF">Nhân viên</option>
+                                    <option value="ROLE_MANAGER">Quản lý</option>
+                                    <option value="ROLE_ADMIN">Quản trị viên</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editStatus" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="editStatus" name="status" required>
+                                    <option value="ACTIVE">Hoạt động</option>
+                                    <option value="INACTIVE">Không hoạt động</option>
+                                    <option value="PENDING">Chưa kích hoạt</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAvatarFile" class="form-label">Ảnh đại diện</label>
+                            <input class="form-control" type="file" id="editAvatarFile" name="avatarFile" accept="image/*">
+                            <div class="form-text">Để trống nếu không muốn thay đổi ảnh đại diện hiện tại.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddress" class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal xác nhận xóa người dùng -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Xác nhận xóa người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa người dùng <span id="userNameToDelete" class="fw-bold"></span>?</p>
+                    <p class="text-danger">Lưu ý: Tất cả dữ liệu liên quan đến người dùng này sẽ bị xóa và không thể khôi phục.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="userIdToDelete">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUser()">Xác nhận xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Hiển thị modal xác nhận xóa người dùng
+        function confirmDeleteUser(button) {
+            const userId = button.getAttribute('data-id');
+            const userName = button.getAttribute('data-name');
+            
+            document.getElementById('userIdToDelete').value = userId;
+            document.getElementById('userNameToDelete').textContent = userName;
+            
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            deleteModal.show();
+        }
+        
+        // Thực hiện xóa người dùng
+        function deleteUser() {
+            const userId = document.getElementById('userIdToDelete').value;
+            
+            fetch(`/admin/users/delete/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    throw new Error('Có lỗi xảy ra khi xóa người dùng.');
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+                console.error('Error:', error);
+            });
+        }
+
+        // Khởi tạo modal chỉnh sửa người dùng
+        document.getElementById('editUserModal').addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-id');
+            const firstName = button.getAttribute('data-firstname');
+            const lastName = button.getAttribute('data-lastname');
+            const email = button.getAttribute('data-email');
+            const phone = button.getAttribute('data-phone');
+            const role = button.getAttribute('data-role');
+            const status = button.getAttribute('data-status');
+            
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editFirstName').value = firstName;
+            document.getElementById('editLastName').value = lastName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editRole').value = role;
+            document.getElementById('editStatus').value = status;
+        });
+        
+        // Validate form thêm người dùng mới
+        document.querySelector('#addUserModal form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu và xác nhận mật khẩu không khớp. Vui lòng kiểm tra lại.');
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

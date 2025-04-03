@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Tạo Lịch Chiếu</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Tạo Lịch Chiếu</h1>
+        <a th:href="@{/admin/showtimes}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <p class="mb-4">Thêm lịch chiếu mới cho hệ thống Vie Cinema. Vui lòng điền đầy đủ thông tin bên dưới.</p>
+
+    <!-- Form tạo lịch chiếu -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form th:action="@{/admin/showtimes/create}" method="post" class="row g-3">
+                <div class="col-md-6">
+                    <label for="movieId" class="form-label">Phim</label>
+                    <select class="form-select" id="movieId" name="movieId" required>
+                        <option value="" selected disabled>Chọn phim</option>
+                        <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="theaterId" class="form-label">Rạp chiếu</label>
+                    <select class="form-select" id="theaterId" name="theaterId" required>
+                        <option value="" selected disabled>Chọn rạp</option>
+                        <option th:each="theater : ${theaters}" th:value="${theater.theaterId}" th:text="${theater.theaterName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="screenId" class="form-label">Phòng chiếu</label>
+                    <select class="form-select" id="screenId" name="screenId" required>
+                        <option value="" selected disabled>Chọn phòng chiếu</option>
+                        <!-- Phòng chiếu sẽ được tải động dựa trên rạp -->
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="showDate" class="form-label">Ngày chiếu</label>
+                    <input type="date" class="form-control" id="showDate" name="showDate" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="startTime" class="form-label">Giờ bắt đầu</label>
+                    <input type="time" class="form-control" id="startTime" name="startTime" required>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Lưu lịch chiếu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const theaterSelect = document.getElementById('theaterId');
+        const screenSelect = document.getElementById('screenId');
+
+        theaterSelect.addEventListener('change', function() {
+            const theaterId = this.value;
+
+            // Xóa các tùy chọn cũ
+            screenSelect.innerHTML = '<option value="" selected disabled>Chọn phòng chiếu</option>';
+
+            if (theaterId) {
+                fetch(`/admin/showtimes/screens-by-theater?theaterId=${theaterId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(screen => {
+                            const option = document.createElement('option');
+                            option.value = screen.id;
+                            option.textContent = screen.name;
+                            screenSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching screens:', error));
+            }
+        });
+    });
+</script>
+</body>
+</html>

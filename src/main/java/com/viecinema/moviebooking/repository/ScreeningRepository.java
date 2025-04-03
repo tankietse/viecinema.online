@@ -1,6 +1,7 @@
 package com.viecinema.moviebooking.repository;
 
 import com.viecinema.moviebooking.model.Screening;
+import com.viecinema.moviebooking.model.Screen;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +28,6 @@ public interface ScreeningRepository extends JpaRepository<Screening, Integer> {
     List<Screening> findByShowtimeShowtimeId(Integer showtimeId);
     List<Screening> findByScreeningDate(LocalDate screeningDate);
     List<Screening> findByShowtimeShowtimeIdAndScreeningDate(Integer showtimeId, LocalDate date);
+    List<Screening> findByScreen(Screen screen);
 }
 

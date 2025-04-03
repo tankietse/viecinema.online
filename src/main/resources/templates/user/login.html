@@ -13,6 +13,16 @@
         <div class="login-form">
             <h1>Đăng nhập</h1>
 
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <div th:if="${error}" class="alert alert-danger" style="color: red; margin-bottom: 15px;">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Hiển thị thông báo thành công nếu có -->
+            <div th:if="${success}" class="alert alert-success" style="color: green; margin-bottom: 15px;">
+                <p th:text="${success}"></p>
+            </div>
+
             <form  th:action="@{/login}" method="POST">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div th:if="${param.error}" class="alert alert-danger">
@@ -57,6 +67,35 @@
         </a>
     </div>
 </section>
+
+<!-- Script để xóa thông báo sau 5 giây -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(function() {
+            var alerts = document.getElementsByClassName('alert');
+            for (var i = 0; i < alerts.length; i++) {
+                alerts[i].style.display = 'none';
+            }
+        }, 5000);
+        
+        // Cho phép hiển thị/ẩn mật khẩu
+        var passwordInput = document.getElementById('password');
+        var togglePassword = passwordInput.nextElementSibling;
+        
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.src = '[[@{/static/img/eye-outline.svg}]]';
+                } else {
+                    passwordInput.type = 'password';
+                    this.src = '[[@{/static/img/eye-password-hide.svg}]]';
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>
 

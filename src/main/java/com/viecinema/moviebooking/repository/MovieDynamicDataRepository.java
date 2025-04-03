@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MovieDynamicDataRepository extends JpaRepository<MovieDynamicData, Integer> {
-    Optional<MovieDynamicData> findByMovieId(int movieId);
+public interface MovieDynamicDataRepository extends JpaRepository<MovieDynamicData, Long> {
+    Optional<MovieDynamicData> findByMovieId(Long movieId);
 }

@@ -29,6 +29,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     WebSecurityCustomizer customizeWebSecurity(){
-        return (web) ->web.ignoring().requestMatchers("/static/**"); // Chỉ định rõ ràng /static/**
+        return (web) ->web.ignoring().requestMatchers("/static/**");
     }
 }

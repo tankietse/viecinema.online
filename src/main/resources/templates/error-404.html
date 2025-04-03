@@ -5,16 +5,286 @@
 <head>
     <meta charset="UTF-8">
     <title>404 - Not Found</title>
+    <style>
+        .error-container {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        .error-code {
+            font-size: 150px;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(90deg, #4527a0, #7c4dff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 10px 20px rgba(76, 29, 149, 0.2);
+            animation: jello 2s ease infinite;
+            line-height: 1;
+        }
+        
+        .error-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0 30px;
+        }
+        
+        .error-message {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .return-btn {
+            background: linear-gradient(90deg, #4527a0, #7c4dff);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .return-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(124, 77, 255, 0.4);
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+            margin: 30px auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border-radius: 50px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #7c4dff;
+            outline: none;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: linear-gradient(90deg, #4527a0, #7c4dff);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            transform: rotate(90deg);
+        }
+        
+        .error-image {
+            max-width: 350px;
+            margin-bottom: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        @keyframes jello {
+            0%, 100% {
+                transform: scale3d(1, 1, 1);
+            }
+            30% {
+                transform: scale3d(1.05, 0.95, 1);
+            }
+            40% {
+                transform: scale3d(0.95, 1.05, 1);
+            }
+            50% {
+                transform: scale3d(1.03, 0.97, 1);
+            }
+            65% {
+                transform: scale3d(0.97, 1.03, 1);
+            }
+            75% {
+                transform: scale3d(1.01, 0.99, 1);
+            }
+        }
+        
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #7c4dff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+            max-width: 700px;
+        }
+        
+        .suggestion {
+            background-color: #f0eafb;
+            color: #4527a0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .suggestion:hover {
+            background-color: #e1d6f8;
+            transform: scale(1.05);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 100px;
+            }
+            
+            .error-title {
+                font-size: 24px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+                padding: 0 20px;
+            }
+            
+            .error-image {
+                max-width: 250px;
+            }
+        }
+    </style>
 </head>
 <body>
 <section layout:fragment="content">
-    <div class="container text-center">
-        <div class="jumbotron mt-5">
-            <h1 class="display-4">404 - Not Found</h1>
-            <p class="lead">Trang bạn đang tìm không tồn tại!</p>
-            <a href="javascript:history.back()" class="btn btn-primary btn-lg">Quay lại</a>
+    <div class="stars" id="stars"></div>
+    <div class="container error-container">
+        <img class="error-image" th:src="@{/static/img/404.svg}" alt="Page Not Found" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2748/2748558.png'">
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">Không tìm thấy trang</h2>
+        <p class="error-message">
+            Rất tiếc, chúng tôi không tìm thấy trang bạn đang tìm kiếm. Trang có thể đã bị xóa, 
+            di chuyển hoặc không tồn tại. Hãy kiểm tra lại URL hoặc thử tìm kiếm nội dung khác.
+        </p>
+        
+        <form action="/search" method="GET" class="search-box">
+            <input type="text" name="q" class="search-input" placeholder="Tìm phim, sự kiện hoặc rạp chiếu..." />
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+        
+        <div class="suggestions">
+            <span>Có thể bạn quan tâm:</span>
+            <a href="#" class="suggestion">Phim đang chiếu</a>
+            <a href="#" class="suggestion">Phim sắp chiếu</a>
+            <a href="#" class="suggestion">Đặt vé</a>
+            <a href="#" class="suggestion">Ưu đãi</a>
+            <a href="#" class="suggestion">Rạp chiếu</a>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="javascript:history.back()" class="return-btn">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a th:href="@{/home}" class="return-btn">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create stars
+            const starsContainer = document.getElementById('stars');
+            const count = 100;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.animationDuration = `${duration}s`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        });
+    </script>
 </section>
 </body>
 </html>

@@ -1,6 +1,5 @@
 package com.viecinema.moviebooking.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.time.LocalDateTime;

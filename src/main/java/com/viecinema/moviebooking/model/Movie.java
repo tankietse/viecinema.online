@@ -18,13 +18,21 @@ import java.util.Set;
         @Index(name = "tmdb_id_index", columnList = "tmdb_id")
 })
 public class Movie {
+    
+    public enum MovieStatus {
+        COMING_SOON,
+        NOW_SHOWING,
+        ENDED,
+        CANCELLED
+    }
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "tmdb_id", nullable = false, unique = true)
-    private Integer tmdbID;
+    private Long tmdbID;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -46,7 +54,24 @@ public class Movie {
 
     @Column(name = "original_language")
     private String originalLanguage;
+    
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private MovieStatus status = MovieStatus.COMING_SOON;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MovieGenre> movieGenres = new HashSet<>();
+    
+    // Convenience methods for view count
+    public Integer getViewCount() {
+        return viewCount != null ? viewCount : 0;
+    }
+    
+    public void incrementViewCount() {
+        if (viewCount == null) viewCount = 0;
+        viewCount++;
+    }
 }

@@ -44,12 +44,12 @@
 
                         <p>
                             <strong>Thể loại:</strong>
-                            <span th:text="${#strings.listJoin(movie.genres, ', ')}"></span>
+                            <span th:text="${#strings.listJoin(#arrays.toArray(movie.genres.![#this.get('name')]), ', ')}"></span>
                         </p>
 
                         <p>
                             <strong>Thời lượng:</strong>
-                            <span th:text="${movie.runtimeMinutes} + ' phút'"></span>
+                            <span th:text="${movie.runtime} + ' phút'"></span>
                         </p>
 
                         <p>
@@ -59,8 +59,7 @@
 
                         <p>
                             <strong>Độ tuổi:</strong>
-                            <span th:if="${movie.adult}">Người lớn (18+)</span>
-                            <span th:unless="${movie.adult}">Mọi độ tuổi</span>
+                            <span>Mọi độ tuổi</span>
                         </p>
 
                         <hr style="width: 60%;">
@@ -68,11 +67,13 @@
                         <div class="detail-rating">
                             <div class="stars">
                                 <span th:each="i : ${#numbers.sequence(1, 5)}"
-                                      th:style="${movie.voteAverage >= i * 2 ? '' : 'opacity: 0.3;'}">
+                                      th:with="rating=${movie instanceof T(com.viecinema.moviebooking.dto.MovieDTO) ? movie.voteAverage : 0}"
+                                      th:style="${rating >= i * 2 ? '' : 'opacity: 0.3;'}">
                                     ⭐
                                 </span>
                             </div>
-                            <span th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 'POINT', 1, 'POINT')} + '/10'"></span>
+                            <span th:with="rating=${movie instanceof T(com.viecinema.moviebooking.dto.MovieDTO) ? movie.voteAverage : 0}"
+                                  th:text="${#numbers.formatDecimal(rating, 1, 'POINT', 1, 'POINT')} + '/10'"></span>
                         </div>
 
 

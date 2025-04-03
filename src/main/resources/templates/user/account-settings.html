@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vie Cinema: Cài đặt tài khoản</title>
+    <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
+    <style>
+        .account-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .account-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .account-header h1 {
+            color: #ff7b00;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .account-nav {
+            display: flex;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .account-nav-item {
+            padding: 15px 20px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .account-nav-item.active {
+            border-bottom: 3px solid #ff7b00;
+            font-weight: bold;
+        }
+        
+        .account-nav-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .account-tabs {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #ff7b00;
+            box-shadow: 0 0 0 2px rgba(255, 123, 0, 0.2);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        
+        .profile-info h2 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        
+        .profile-info p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .upload-avatar {
+            margin-top: 10px;
+        }
+        
+        .upload-btn {
+            border: none;
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .save-btn {
+            background-color: #ff7b00;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            background-color: #e67000;
+        }
+        
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-text {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #ff7b00;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .password-requirements {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .address-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .membership-info {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .membership-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .membership-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        
+        .membership-points {
+            font-size: 24px;
+            color: #ff7b00;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #ff7b00;
+            width: 70%;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .upgrade-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .payment-methods {
+            margin-top: 20px;
+        }
+        
+        .payment-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .payment-card-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-icon {
+            width: 40px;
+            margin-right: 15px;
+        }
+        
+        .card-details h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .card-details p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .card-actions a {
+            color: #ff7b00;
+            text-decoration: none;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+        
+        .add-payment {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            color: #333;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .add-payment:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .notification-badge {
+            background-color: #ff7b00;
+            color: white;
+            font-size: 12px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .account-nav {
+                flex-direction: column;
+            }
+            
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include layout -->
+    <section layout:fragment="content">
+        <div class="main-container custom-scrollbar">
+            <div class="account-container">
+                <div class="account-header">
+                    <h1>Cài đặt tài khoản</h1>
+                    <p>Quản lý thông tin cá nhân, mật khẩu và cài đặt thông báo</p>
+                </div>
+                
+                <div class="account-nav">
+                    <div class="account-nav-item active" data-tab="profile">Thông tin cá nhân</div>
+                    <div class="account-nav-item" data-tab="password">Bảo mật</div>
+                    <div class="account-nav-item" data-tab="notifications">Thông báo</div>
+                    <div class="account-nav-item" data-tab="membership">Thành viên & Thanh toán</div>
+                </div>
+                
+                <div class="account-tabs">
+                    <!-- Profile Tab -->
+                    <div id="profile" class="tab-content active">
+                        <div class="profile-header">
+                            <img th:if="${user.avatarUrl}" th:src="${user.avatarUrl}" class="profile-avatar" alt="Avatar">
+                            <img th:unless="${user.avatarUrl}" th:src="@{/static/img/default-avatar.png}" class="profile-avatar" alt="Default Avatar">
+                            <div class="profile-info">
+                                <h2 th:text="${user.fullName}">Nguyễn Văn A</h2>
+                                <p th:text="${user.email}">email@example.com</p>
+                                <div class="upload-avatar">
+                                    <input type="file" id="avatar-upload" hidden>
+                                    <label for="avatar-upload" class="upload-btn">Thay đổi ảnh</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h2 class="section-title">Thông tin cơ bản</h2>
+                        <form th:action="@{/account/update-profile}" method="post">
+                            <div class="two-columns">
+                                <div class="form-group">
+                                    <label for="firstName">Họ</label>
+                                    <input type="text" id="firstName" name="firstName" class="form-control" th:value="${user.firstName}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Tên</label>
+                                    <input type="text" id="lastName" name="lastName" class="form-control" th:value="${user.lastName}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" th:value="${user.email}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Số điện thoại</label>
+                                <input type="tel" id="phone" name="phone" class="form-control" th:value="${user.phone}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="birthDate">Ngày sinh</label>
+                                <input type="date" id="birthDate" name="birthDate" class="form-control" th:value="${#temporals.format(user.birthDate, 'yyyy-MM-dd')}">
+                            </div>
+                            
+                            <div class="address-form">
+                                <h2 class="section-title">Địa chỉ</h2>
+                                <div class="form-group">
+                                    <label for="address">Địa chỉ</label>
+                                    <input type="text" id="address" name="address" class="form-control" th:value="${user.address}">
+                                </div>
+                                
+                                <div class="two-columns">
+                                    <div class="form-group">
+                                        <label for="city">Thành phố</label>
+                                        <input type="text" id="city" name="city" class="form-control" th:value="${user.city}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="district">Quận/Huyện</label>
+                                        <input type="text" id="district" name="district" class="form-control" th:value="${user.district}">
+                                    </div>
+                                </div>
+                                
+                                <div class="two-columns">
+                                    <div class="form-group">
+                                        <label for="ward">Phường/Xã</label>
+                                        <input type="text" id="ward" name="ward" class="form-control" th:value="${user.ward}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postalCode">Mã Bưu Điện</label>
+                                        <input type="text" id="postalCode" name="postalCode" class="form-control" th:value="${user.postalCode}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="save-btn">Lưu thay đổi</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Password Tab -->
+                    <div id="password" class="tab-content">
+                        <h2 class="section-title">Thay đổi mật khẩu</h2>
+                        <form th:action="@{/account/change-password}" method="post">
+                            <div class="form-group">
+                                <label for="currentPassword">Mật khẩu hiện tại</label>
+                                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword">Mật khẩu mới</label>
+                                <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+                                <div class="password-requirements">
+                                    <p>Mật khẩu phải có:</p>
+                                    <ul>
+                                        <li>Ít nhất 8 ký tự</li>
+                                        <li>Ít nhất 1 ký tự in hoa</li>
+                                        <li>Ít nhất 1 ký tự số</li>
+                                        <li>Ít nhất 1 ký tự đặc biệt (!, @, #, $, %, v.v.)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="save-btn">Cập nhật mật khẩu</button>
+                            </div>
+                        </form>
+                        
+                        <h2 class="section-title" style="margin-top: 40px;">Bảo mật tài khoản</h2>
+                        <form th:action="@{/account/security-settings}" method="post">
+                            <div class="notification-item">
+                                <div class="notification-text">Xác thực hai yếu tố</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="twoFactorAuth" th:checked="${user.twoFactorAuthEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-text">Thông báo khi có đăng nhập mới</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="loginNotification" th:checked="${user.loginNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="save-btn">Lưu thay đổi</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Notifications Tab -->
+                    <div id="notifications" class="tab-content">
+                        <h2 class="section-title">Cài đặt thông báo</h2>
+                        <form th:action="@{/account/notification-settings}" method="post">
+                            <div class="notification-item">
+                                <div class="notification-text">Email thông báo về phim mới</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="newMovieNotification" th:checked="${user.newMovieNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-text">Email thông báo về vé đã đặt</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="bookingNotification" th:checked="${user.bookingNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-text">Email nhắc nhở trước suất chiếu</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="reminderNotification" th:checked="${user.reminderNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-text">Email thông báo về khuyến mãi</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="promotionNotification" th:checked="${user.promotionNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-text">SMS thông báo</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="smsNotification" th:checked="${user.smsNotificationEnabled}">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="save-btn">Lưu thay đổi</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Membership Tab -->
+                    <div id="membership" class="tab-content">
+                        <div class="membership-info">
+                            <div class="membership-header">
+                                <h2 class="section-title" style="margin: 0; border: none; padding: 0;">Thành viên</h2>
+                                <span class="membership-type" th:text="${user.membershipType}">Thành viên Bạc</span>
+                            </div>
+                            
+                            <div class="membership-points">
+                                <span th:text="${user.points}">720</span> điểm
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar" th:style="'width: ' + ${(user.points * 100) / 1000} + '%'"></div>
+                            </div>
+                            
+                            <div class="progress-info">
+                                <span>0 điểm</span>
+                                <span>1000 điểm (Thành viên Vàng)</span>
+                            </div>
+                            
+                            <div class="upgrade-info">
+                                <p>Còn <strong th:text="${1000 - user.points}">280</strong> điểm nữa để nâng cấp lên <strong>Thành viên Vàng</strong> và nhận thêm ưu đãi!</p>
+                            </div>
+                        </div>
+                        
+                        <h2 class="section-title">Phương thức thanh toán</h2>
+                        <div class="payment-methods">
+                            <div th:each="payment : ${user.paymentMethods}" class="payment-card">
+                                <div class="payment-card-info">
+                                    <img 
+                                        th:src="@{${payment.type == 'VISA' ? '/static/img/visa.png' : (payment.type == 'MASTERCARD' ? '/static/img/mastercard.png' : '/static/img/paypal.png')}}" 
+                                        class="card-icon" 
+                                        alt="Payment method">
+                                    <div class="card-details">
+                                        <h3 th:text="${payment.type}">VISA</h3>
+                                        <p th:text="'**** **** **** ' + ${payment.lastFourDigits}">**** **** **** 1234</p>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="#" th:data-id="${payment.id}" class="edit-card">Chỉnh sửa</a>
+                                    <a href="#" th:data-id="${payment.id}" class="remove-card">Xóa</a>
+                                </div>
+                            </div>
+                            
+                            <a href="#" class="add-payment">+ Thêm phương thức thanh toán mới</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Tab switching
+                const navItems = document.querySelectorAll('.account-nav-item');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                navItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Remove active class from all nav items
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        // Add active class to current nav item
+                        this.classList.add('active');
+                        
+                        // Hide all tab contents
+                        tabContents.forEach(tab => tab.classList.remove('active'));
+                        // Show the selected tab content
+                        const tabId = this.getAttribute('data-tab');
+                        document.getElementById(tabId).classList.add('active');
+                    });
+                });
+                
+                // Password validation
+                const newPasswordInput = document.getElementById('newPassword');
+                const confirmPasswordInput = document.getElementById('confirmPassword');
+                
+                if (newPasswordInput && confirmPasswordInput) {
+                    confirmPasswordInput.addEventListener('input', function() {
+                        if (this.value !== newPasswordInput.value) {
+                            this.setCustomValidity('Mật khẩu không khớp');
+                        } else {
+                            this.setCustomValidity('');
+                        }
+                    });
+                }
+            });
+        </script>
+    </section>
+</body>
+</html>

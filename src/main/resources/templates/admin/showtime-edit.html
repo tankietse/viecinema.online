@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Chỉnh Sửa Lịch Chiếu</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Chỉnh Sửa Lịch Chiếu</h1>
+        <a th:href="@{/admin/showtimes}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <p class="mb-4">Cập nhật thông tin lịch chiếu trong hệ thống Vie Cinema. Vui lòng chỉnh sửa thông tin bên dưới.</p>
+
+    <!-- Form chỉnh sửa lịch chiếu -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form th:action="@{/admin/showtimes/update}" method="post" class="row g-3">
+                <input type="hidden" name="id" th:value="${showtime.id}">
+                <div class="col-md-6">
+                    <label for="movieId" class="form-label">Phim</label>
+                    <select class="form-select" id="movieId" name="movieId" required>
+                        <option value="" disabled>Chọn phim</option>
+                        <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}" th:selected="${movie.id == showtime.movie.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="theaterId" class="form-label">Rạp chiếu</label>
+                    <select class="form-select" id="theaterId" name="theaterId" required>
+                        <option value="" disabled>Chọn rạp</option>
+                        <option th:each="theater : ${theaters}" th:value="${theater.id}" th:text="${theater.name}" th:selected="${theater.id == showtime.theater.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="screenId" class="form-label">Phòng chiếu</label>
+                    <select class="form-select" id="screenId" name="screenId" required>
+                        <option value="" disabled>Chọn phòng chiếu</option>
+                        <option th:each="screen : ${theaterScreens}" th:value="${screen.id}" th:text="${screen.name}" th:selected="${screen.id == showtime.screen.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="showDate" class="form-label">Ngày chiếu</label>
+                    <input type="date" class="form-control" id="showDate" name="showDate" th:value="${showtime.showDate}" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="startTime" class="form-label">Giờ bắt đầu</label>
+                    <input type="time" class="form-control" id="startTime" name="startTime" th:value="${showtime.startTime}" required>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const theaterSelect = document.getElementById('theaterId');
+        const screenSelect = document.getElementById('screenId');
+
+        theaterSelect.addEventListener('change', function() {
+            const theaterId = this.value;
+
+            // Xóa các tùy chọn cũ
+            screenSelect.innerHTML = '<option value="" disabled>Chọn phòng chiếu</option>';
+
+            if (theaterId) {
+                fetch(`/api/theaters/${theaterId}/screens`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(screen => {
+                            const option = document.createElement('option');
+                            option.value = screen.id;
+                            option.textContent = screen.name;
+                            screenSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching screens:', error));
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý Rạp Chiếu</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý Rạp Chiếu Phim</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTheaterModal">
+            <i class="fas fa-plus mr-1"></i> Thêm rạp phim mới
+        </button>
+    </div>
+    
+    <p class="mb-4">Quản lý thông tin các rạp chiếu phim trong hệ thống Vie Cinema. Bạn có thể thêm, sửa, xóa thông tin rạp chiếu phim.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bảng rạp phim -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Danh sách rạp chiếu phim</h6>
+                <div>
+                    <input type="text" id="theaterSearch" class="form-control form-control-sm" placeholder="Tìm kiếm...">
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="theatersTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên rạp</th>
+                            <th>Thành phố</th>
+                            <th>Số phòng chiếu</th>
+                            <th>Tổng ghế</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="theater : ${theaters}">
+                            <td th:text="${theater.theaterId}"></td>
+                            <td th:text="${theater.theaterName}"></td>
+                            <td th:text="${theater.city}"></td>
+                            <td th:text="${theater.screens.size()}"></td>
+                            <td th:text="${theater.capacity}"></td>
+                            <td>
+                                <button class="btn btn-sm btn-info mr-1" data-bs-toggle="modal" data-bs-target="#editTheaterModal"
+                                        th:attr="data-id=${theater.theaterId}, data-name=${theater.theaterName}, data-city=${theater.city}, 
+                                                data-screen-count=${theater.screens.size()}, data-capacity=${theater.capacity}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" th:onclick="'deleteTheater(this)'" th:attr="data-id=${theater.theaterId}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <a th:href="@{/admin/theaters/{id}/screens(id=${theater.theaterId})}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-tv"></i> Phòng chiếu
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(theaters)}">
+                            <td colspan="8" class="text-center">Không có dữ liệu rạp chiếu phim</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Phân trang -->
+            <div th:if="${totalPages > 1}" class="d-flex justify-content-center">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/theaters(page=${currentPage - 1})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/admin/theaters(page=${i})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/admin/theaters(page=${currentPage + 1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal thêm rạp chiếu -->
+    <div class="modal fade" id="addTheaterModal" tabindex="-1" aria-labelledby="addTheaterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTheaterModalLabel">Thêm rạp chiếu phim mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/theaters/create}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="theaterName" class="form-label">Tên rạp chiếu phim</label>
+                            <input type="text" class="form-control" id="theaterName" name="theaterName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">Thành phố</label>
+                            <input type="text" class="form-control" id="city" name="city" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal sửa rạp chiếu -->
+    <div class="modal fade" id="editTheaterModal" tabindex="-1" aria-labelledby="editTheaterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTheaterModalLabel">Chỉnh sửa thông tin rạp chiếu phim</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/theaters/update}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editTheaterId" name="id">
+                        <div class="mb-3">
+                            <label for="editTheaterName" class="form-label">Tên rạp chiếu phim</label>
+                            <input type="text" class="form-control" id="editTheaterName" name="theaterName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddress" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="editAddress" name="address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCity" class="form-label">Thành phố</label>
+                            <input type="text" class="form-control" id="editCity" name="city" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPhone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="editPhone" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Script tìm kiếm trong bảng
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('theaterSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    const searchValue = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#theatersTable tbody tr');
+                    
+                    rows.forEach(row => {
+                        let found = false;
+                        row.querySelectorAll('td').forEach(cell => {
+                            if (cell.textContent.toLowerCase().indexOf(searchValue) > -1) {
+                                found = true;
+                            }
+                        });
+                        
+                        if (found) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+
+        function deleteTheater(button) {
+            const id = button.getAttribute('data-id');
+            if (confirm('Bạn có chắc chắn muốn xóa rạp chiếu phim này không? Mọi dữ liệu liên quan cũng sẽ bị xóa.')) {
+                // Sử dụng fetch API để gửi yêu cầu xóa
+                fetch(`/admin/theaters/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Nếu xóa thành công, reload trang
+                        window.location.reload();
+                    } else {
+                        // Xử lý lỗi
+                        alert('Có lỗi xảy ra khi xóa rạp chiếu phim. Vui lòng thử lại.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa rạp chiếu phim. Vui lòng thử lại.');
+                });
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

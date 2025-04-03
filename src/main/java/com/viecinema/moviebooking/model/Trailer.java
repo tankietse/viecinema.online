@@ -20,10 +20,10 @@ public class Trailer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "video_id")
-    private int trailerId;
+    private Long trailerId;
 
     @Column(name = "movie_id")
-    private int movieId;
+    private Long movieId;
 
     @Column(name = "key_value", length = 255)
     private String key;

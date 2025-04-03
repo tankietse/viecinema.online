@@ -33,19 +33,17 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-//    @NotBlank(message = "Bạn cần nhập số điện thoại")
-    @Size(min = 10, message = "Số điện thoại không hợp lệ")
-    @Column(name = "phone_number" , nullable = false)
+    @NotBlank(message = "Bạn cần nhập số điện thoại")
+    @Size(min = 10, max = 15, message = "Số điện thoại không hợp lệ")
+    @Column(name = "phone_number", nullable = false)
     private String phone_number;
 
-//    @NotBlank(message = "Dữ liệu bắt buộc")
-    @Email(message = "Không đúng định dạng")
+    @Email(message = "Email không đúng định dạng")
     @Column(unique = true)
     private String email;
 
     @Column(name = "locked", nullable = false)
     private boolean locked = false;
-
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -58,6 +56,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     public enum UserRole {
-        ADMIN, CUSTOMER;
+        ADMIN, CUSTOMER
     }
 }

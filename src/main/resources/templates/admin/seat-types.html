@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý Loại Ghế</title>
+    <style>
+        .seat-type-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý Loại Ghế</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSeatTypeModal">
+            <i class="fas fa-plus mr-1"></i> Thêm Loại Ghế Mới
+        </button>
+    </div>
+
+    <p class="mb-4">Quản lý các loại ghế trong hệ thống rạp chiếu phim.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bảng loại ghế -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên loại ghế</th>
+                            <th>Giá ghế</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="seatType : ${seatTypes}">
+                            <td th:text="${seatType.seatTypeId}">1</td>
+                            <td th:text="${seatType.typeName}">VIP</td>
+                            <td th:text="${#numbers.formatDecimal(seatType.seatPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">50,000 ₫</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editSeatTypeModal"
+                                            th:attr="data-id=${seatType.seatTypeId},
+                                                    data-name=${seatType.typeName},
+                                                    data-surcharge=${seatType.seatPrice}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteSeatType(this)"
+                                            th:attr="data-id=${seatType.seatTypeId},
+                                                    data-name=${seatType.typeName}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm loại ghế mới -->
+    <div class="modal fade" id="addSeatTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm Loại Ghế Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/seat-types/create}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="typeName" class="form-label">Tên loại ghế</label>
+                            <input type="text" class="form-control" id="typeName" name="typeName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="seatPrice" class="form-label">Giá ghế</label>
+                            <input type="number" class="form-control" id="seatPrice" name="seatPrice" min="0" step="1000" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm mới</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa loại ghế -->
+    <div class="modal fade" id="editSeatTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh Sửa Loại Ghế</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/seat-types/update}" method="post">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Tên loại ghế</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSurcharge" class="form-label">Giá ghế</label>
+                            <input type="number" class="form-control" id="editSurcharge" name="surcharge" min="0" step="1000" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deleteSeatTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa loại ghế <span id="seatTypeNameToDelete" class="fw-bold"></span>?</p>
+                    <p class="text-danger">Lưu ý: Hành động này không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <form th:action="@{/admin/seat-types/delete}" method="post">
+                        <input type="hidden" id="seatTypeIdToDelete" name="id">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Xử lý modal chỉnh sửa
+        document.getElementById('editSeatTypeModal').addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const surcharge = button.getAttribute('data-surcharge');
+
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editSurcharge').value = surcharge;
+        });
+
+        // Xử lý xác nhận xóa
+        function confirmDeleteSeatType(button) {
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            
+            document.getElementById('seatTypeIdToDelete').value = id;
+            document.getElementById('seatTypeNameToDelete').textContent = name;
+            
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteSeatTypeModal'));
+            deleteModal.show();
+        }
+    </script>
+</th:block>
+</body>
+</html>

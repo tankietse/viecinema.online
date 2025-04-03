@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Mac ###
+.DS_Store
+
+### Custom ###
+application.properties
+application-dev.properties
+application-local.properties
+logs/

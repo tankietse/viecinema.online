@@ -33,7 +33,7 @@ public class MovieControler {
     private ScreenService screenService;
 
     @GetMapping("/movie-detail")
-    public String getMovieDetailPage(@RequestParam("id") Integer id, Model model) {
+    public String getMovieDetailPage(@RequestParam("id") Long id, Model model) {
         MovieDTO movie = movieService.getMovieById(id);
         List<Showtime> showtimes = showtimeService.getShowtimesByMovieId(movie.getId());
         List<List<String>> formattedShowtimeDates = getFormattedShowtimeDates(showtimes);

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Thêm/Chỉnh sửa phim</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .preview-poster {
+            max-width: 200px;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .preview-backdrop {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .select2-container .select2-selection--multiple {
+            min-height: 38px;
+        }
+        
+        .form-section {
+            border-bottom: 1px solid #e3e6f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section-title {
+            font-weight: 600;
+            color: #4527a0;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800" th:text="${movie != null} ? 'Chỉnh sửa phim' : 'Thêm phim mới'">Thêm/Chỉnh sửa phim</h1>
+        <a th:href="@{/admin/movies}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-1"></i> Quay lại danh sách
+        </a>
+    </div>
+    
+    <p class="mb-4" th:text="${movie != null} ? 'Chỉnh sửa thông tin phim trong hệ thống Vie Cinema.' : 'Thêm phim mới vào hệ thống Vie Cinema.'">Thêm/Chỉnh sửa thông tin phim vào hệ thống Vie Cinema.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Form phim -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form th:action="${movie != null} ? @{/admin/movies/update} : @{/admin/movies/create}" 
+                  method="post" 
+                  enctype="multipart/form-data" 
+                  class="needs-validation" 
+                  novalidate>
+                
+                <input type="hidden" name="id" th:if="${movie != null}" th:value="${movie.id}">
+                
+                <!-- Thông tin cơ bản -->
+                <div class="form-section">
+                    <h5 class="form-section-title">Thông tin cơ bản</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="title" class="form-label">Tên phim <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" th:value="${movie != null ? movie.title : ''}" required>
+                            <div class="invalid-feedback">Vui lòng nhập tên phim</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="originalTitle" class="form-label">Tên phim gốc</label>
+                            <input type="text" class="form-control" id="movieTitle" name="movieTitle" th:value="${movie != null ? movie.movieTitle : ''}">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="genreList" class="form-label">Thể loại <span class="text-danger">*</span></label>
+                            <select class="form-control select2-multi" id="genreList" name="genres" multiple="multiple" required>
+                                <option th:each="genre : ${genres}" th:value="${genre}" th:text="${genre}" th:selected="${movie != null && movie.genres != null && movie.genres.contains(genre)}"></option>
+                            </select>
+                            <div class="invalid-feedback">Vui lòng chọn ít nhất một thể loại</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="duration" class="form-label">Thời lượng (phút) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="duration" name="duration" min="1" th:value="${movie != null ? movie.duration : ''}" required>
+                            <div class="invalid-feedback">Vui lòng nhập thời lượng phim</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="releaseDate" class="form-label">Ngày khởi chiếu <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="releaseDate" name="releaseDate" th:value="${movie != null ? movie.releaseDate : ''}" required>
+                            <div class="invalid-feedback">Vui lòng chọn ngày khởi chiếu</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="rating" class="form-label">Đánh giá (0-10)</label>
+                            <input type="number" class="form-control" id="rating" name="rating" min="0" max="10" step="0.1" th:value="${movie != null ? movie.rating : '0'}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="COMING_SOON" th:selected="${movie != null && movie.status == 'COMING_SOON'}">Sắp chiếu</option>
+                                <option value="NOW_SHOWING" th:selected="${movie != null && movie.status == 'NOW_SHOWING'}">Đang chiếu</option>
+                                <option value="ENDED" th:selected="${movie != null && movie.status == 'ENDED'}">Đã kết thúc</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mô tả phim -->
+                <div class="form-section">
+                    <h5 class="form-section-title">Mô tả và Chi tiết</h5>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="shortDescription" class="form-label">Mô tả ngắn</label>
+                            <textarea class="form-control" id="shortDescription" name="shortDescription" rows="2" th:text="${movie != null ? movie.shortDescription : ''}"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="description" class="form-label">Mô tả chi tiết</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" th:text="${movie != null ? movie.description : ''}"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="director" class="form-label">Đạo diễn</label>
+                            <input type="text" class="form-control" id="director" name="director" th:value="${movie != null ? movie.director : ''}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="actors" class="form-label">Diễn viên</label>
+                            <input type="text" class="form-control" id="actors" name="actors" th:value="${movie != null ? movie.actors : ''}">
+                            <div class="form-text">Nhập tên các diễn viên, cách nhau bằng dấu phẩy</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="country" class="form-label">Quốc gia sản xuất</label>
+                            <input type="text" class="form-control" id="country" name="country" th:value="${movie != null ? movie.country : ''}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="language" class="form-label">Ngôn ngữ</label>
+                            <input type="text" class="form-control" id="language" name="language" th:value="${movie != null ? movie.language : ''}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hình ảnh và media -->
+                <div class="form-section">
+                    <h5 class="form-section-title">Hình ảnh và Media</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="posterFile" class="form-label">Poster phim</label>
+                            <input type="file" class="form-control" id="posterFile" name="posterFile" accept="image/*">
+                            <div class="form-text" th:if="${movie != null && movie.posterPath != null}">Để trống nếu không muốn thay đổi poster hiện tại</div>
+                            <img th:if="${movie != null && movie.posterPath != null}" th:src="${movie.posterPath}" class="preview-poster" style="display: block;">
+                            <img id="posterPreview" class="preview-poster">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="backdropFile" class="form-label">Ảnh nền</label>
+                            <input type="file" class="form-control" id="backdropFile" name="backdropFile" accept="image/*">
+                            <div class="form-text" th:if="${movie != null && movie.backdropUrl != null}">Để trống nếu không muốn thay đổi ảnh nền hiện tại</div>
+                            <img th:if="${movie != null && movie.backdropUrl != null}" th:src="${movie.backdropPath}" class="preview-backdrop" style="display: block;">
+                            <img id="backdropPreview" class="preview-backdrop">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="trailerUrl" class="form-label">Link trailer (YouTube)</label>
+                            <input type="url" class="form-control" id="trailerUrl" name="trailerUrl" th:value="${movie != null ? movie.trailerUrl : ''}" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thông tin phân loại -->
+                <div class="form-section">
+                    <h5 class="form-section-title">Phân loại và thông tin bổ sung</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="ageRating" class="form-label">Độ tuổi</label>
+                            <select class="form-select" id="ageRating" name="ageRating">
+                                <option value="P" th:selected="${movie != null && movie.ageRating == 'P'}">P - Mọi lứa tuổi</option>
+                                <option value="C13" th:selected="${movie != null && movie.ageRating == 'C13'}">C13 - Trên 13 tuổi</option>
+                                <option value="C16" th:selected="${movie != null && movie.ageRating == 'C16'}">C16 - Trên 16 tuổi</option>
+                                <option value="C18" th:selected="${movie != null && movie.ageRating == 'C18'}">C18 - Trên 18 tuổi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="featured" class="form-label">Phim nổi bật</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="featured" name="featured" th:checked="${movie != null && movie.featured}">
+                                <label class="form-check-label" for="featured">Hiển thị phim ở phần nổi bật trang chủ</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Làm mới</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Lưu phim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo Select2 cho thể loại
+            $('.select2-multi').select2({
+                placeholder: 'Chọn thể loại phim',
+                allowClear: true,
+                tags: true
+            });
+            
+            // Preview ảnh poster khi chọn file
+            $('#posterFile').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#posterPreview').attr('src', e.target.result).css('display', 'block');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Preview ảnh nền khi chọn file
+            $('#backdropFile').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#backdropPreview').attr('src', e.target.result).css('display', 'block');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Form validation
+            (function () {
+                'use strict'
+                
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                const forms = document.querySelectorAll('.needs-validation')
+                
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+        });
+    </script>
+</th:block>
+</body>
+</html>

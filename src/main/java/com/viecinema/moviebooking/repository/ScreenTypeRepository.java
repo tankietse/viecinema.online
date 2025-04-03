@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ScreenTypeRepository extends JpaRepository<ScreenType, Integer> {
+    boolean existsByTypeName(String typeName);
 }
-

@@ -54,7 +54,7 @@ public class TMDBApiClient {
         return fetchMovies("https://api.themoviedb.org/3/movie/now_playing?language=vi-VN&api_key=" + apiKey);
     }
 
-    public List<TrailerDTO> getMovieTrailers(int tmdbId) {
+    public List<TrailerDTO> getMovieTrailers(Long tmdbId) {
         String url = String.format("https://api.themoviedb.org/3/movie/%d/videos?language=vi-VN&api_key=%s", tmdbId, apiKey);
         Request request = new Request.Builder()
                 .url(url)
@@ -69,7 +69,7 @@ public class TMDBApiClient {
 
             String responseBody = response.body().string();
             Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
-            List<Map<String, Object>> results = (List<Map<String, Object>>) responseMap.get("results");
+            List<Map<String, Object>> results = objectMapper.convertValue(responseMap.get("results"), new TypeReference<List<Map<String, Object>>>() {});
 
             return results.stream().map(this::mapToTrailerDTO).collect(Collectors.toList());
 
@@ -90,7 +90,6 @@ public class TMDBApiClient {
         trailerDTO.setOfficial(Optional.ofNullable(trailerData.get("official"))
                 .map(Boolean.class::cast)
                 .orElse(false));
-        String publishedAtString = (String) trailerData.get("published_at");
         trailerDTO.setPublishedAt(Optional.ofNullable((String) trailerData.get("published_at"))
                 .map(OffsetDateTime::parse)
                 .map(OffsetDateTime::toLocalDateTime)
@@ -115,7 +114,7 @@ public class TMDBApiClient {
 
             String responseBody = response.body().string();
             Map<String, Object> responseMap = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
-            List<Map<String, Object>> results = (List<Map<String, Object>>) responseMap.get("results");
+            List<Map<String, Object>> results = objectMapper.convertValue(responseMap.get("results"), new TypeReference<List<Map<String, Object>>>() {});
 
             return results.stream().map(this::fetchAndMapToMovieDTO).collect(Collectors.toList());
 
@@ -125,11 +124,10 @@ public class TMDBApiClient {
     }
 
     private MovieDTO fetchAndMapToMovieDTO(Map<String, Object> movieData) {
-        int movieId = (int) movieData.get("id");
-        return getMovieDetails(movieId);
+        return getMovieDetails(((Number) movieData.get("id")).longValue());
     }
 
-    public MovieDTO getMovieDetails(int movieId) {
+    public MovieDTO getMovieDetails(Long movieId) {
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "?language=vi-VN";
         Request request = new Request.Builder()
                 .url(url)
@@ -154,7 +152,7 @@ public class TMDBApiClient {
 
     private MovieDTO mapToMovieDTO(Map<String, Object> movieData) {
         try {
-            int id = (int) movieData.get("id");
+            Long id = ((Number) movieData.get("id")).longValue();
             String title = (String) movieData.get("title");
             String overview = (String) movieData.get("overview");
             String posterPath = (String) movieData.get("poster_path");

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Quản lý Giá Vé</title>
+    <style>
+        .price-card {
+            transition: all 0.3s ease;
+        }
+        .price-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        .price-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .price-body {
+            padding: 1.5rem;
+        }
+        .screen-type-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 1rem;
+        }
+        .price-table th {
+            background-color: rgba(69, 39, 160, 0.05);
+        }
+        .fs-price {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .screen-type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+        .price-actions {
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Quản lý Giá Vé</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPriceModal">
+            <i class="fas fa-plus mr-1"></i> Thêm cấu hình giá mới
+        </button>
+    </div>
+    
+    <p class="mb-4">Quản lý cấu hình giá vé cơ bản cho các loại phòng chiếu và thời gian khác nhau trong hệ thống Vie Cinema.</p>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    <!-- Tabs điều hướng cho các phần giá vé -->
+    <ul class="nav nav-tabs mb-4" id="pricingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="base-pricing-tab" data-bs-toggle="tab" data-bs-target="#base-pricing" type="button" role="tab" aria-controls="base-pricing" aria-selected="true">
+                Giá vé cơ bản
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" href="/admin/pricing/special">
+                Giá vé đặc biệt
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pricing-rules-tab" data-bs-toggle="tab" data-bs-target="#pricing-rules" type="button" role="tab" aria-controls="pricing-rules" aria-selected="false">
+                Quy tắc tính giá
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="pricingTabsContent">
+        <!-- Giá vé cơ bản -->
+        <div class="tab-pane fade show active" id="base-pricing" role="tabpanel" aria-labelledby="base-pricing-tab">
+            <!-- Giá theo loại phòng chiếu -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Giá vé theo loại phòng chiếu</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Standard Screen -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card price-card h-100">
+                                <div class="price-header text-center">
+                                    <div class="screen-type-icon mx-auto">
+                                        <i class="fas fa-tv fa-lg"></i>
+                                    </div>
+                                    <h5 class="card-title mb-0">Phòng Tiêu Chuẩn (2D)</h5>
+                                    <span class="screen-type-badge">Standard</span>
+                                </div>
+                                <div class="price-body">
+                                    <div class="text-center mb-4">
+                                        <span class="fs-price">90.000 đ</span>
+                                        <p class="text-muted mb-0">Giá cơ bản - Người lớn</p>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-check-circle"></i> Màn hình chuẩn HD</li>
+                                        <li><i class="fas fa-check-circle"></i> Âm thanh vòm chất lượng</li>
+                                        <li><i class="fas fa-check-circle"></i> Ghế ngồi tiêu chuẩn</li>
+                                    </ul>
+                                    <div class="price-actions">
+                                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#editPriceModal" data-screen-type="STANDARD">
+                                            <i class="fas fa-edit me-1"></i> Cập nhật giá
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Premium Screen -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card price-card h-100">
+                                <div class="price-header text-center" style="background: linear-gradient(135deg, #5e35b1 0%, #7c4dff 100%);">
+                                    <div class="screen-type-icon mx-auto">
+                                        <i class="fas fa-film fa-lg"></i>
+                                    </div>
+                                    <h5 class="card-title mb-0">Phòng Cao Cấp (3D)</h5>
+                                    <span class="screen-type-badge">Premium</span>
+                                </div>
+                                <div class="price-body">
+                                    <div class="text-center mb-4">
+                                        <span class="fs-price">120.000 đ</span>
+                                        <p class="text-muted mb-0">Giá cơ bản - Người lớn</p>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-check-circle"></i> Màn hình 3D sắc nét</li>
+                                        <li><i class="fas fa-check-circle"></i> Âm thanh Dolby Atmos</li>
+                                        <li><i class="fas fa-check-circle"></i> Ghế ngồi êm ái, rộng rãi</li>
+                                    </ul>
+                                    <div class="price-actions">
+                                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#editPriceModal" data-screen-type="PREMIUM">
+                                            <i class="fas fa-edit me-1"></i> Cập nhật giá
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VIP/IMAX Screen -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card price-card h-100">
+                                <div class="price-header text-center" style="background: linear-gradient(135deg, #283593 0%, #3949ab 100%);">
+                                    <div class="screen-type-icon mx-auto">
+                                        <i class="fas fa-crown fa-lg"></i>
+                                    </div>
+                                    <h5 class="card-title mb-0">Phòng VIP (IMAX)</h5>
+                                    <span class="screen-type-badge">IMAX</span>
+                                </div>
+                                <div class="price-body">
+                                    <div class="text-center mb-4">
+                                        <span class="fs-price">180.000 đ</span>
+                                        <p class="text-muted mb-0">Giá cơ bản - Người lớn</p>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-check-circle"></i> Màn hình IMAX cực lớn</li>
+                                        <li><i class="fas fa-check-circle"></i> Âm thanh siêu thực 360°</li>
+                                        <li><i class="fas fa-check-circle"></i> Ghế bọc da cao cấp, ngả lưng</li>
+                                    </ul>
+                                    <div class="price-actions">
+                                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#editPriceModal" data-screen-type="VIP">
+                                            <i class="fas fa-edit me-1"></i> Cập nhật giá
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bảng giá theo thời gian -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hệ số giá theo thời gian</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered price-table" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Hệ số giá</th>
+                                    <th>Mô tả</th>
+                                    <th>Áp dụng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sáng (08:00 - 12:00)</td>
+                                    <td>0.8</td>
+                                    <td>Giảm 20% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editTimeFactorModal" data-time-slot="MORNING">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Trưa (12:00 - 17:00)</td>
+                                    <td>0.9</td>
+                                    <td>Giảm 10% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editTimeFactorModal" data-time-slot="AFTERNOON">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tối (17:00 - 22:00)</td>
+                                    <td>1.0</td>
+                                    <td>Giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editTimeFactorModal" data-time-slot="EVENING">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Cuối tuần (Thứ 7, Chủ nhật)</td>
+                                    <td>1.2</td>
+                                    <td>Tăng 20% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editTimeFactorModal" data-time-slot="WEEKEND">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày lễ</td>
+                                    <td>1.3</td>
+                                    <td>Tăng 30% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editTimeFactorModal" data-time-slot="HOLIDAY">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-muted mt-3">
+                        <small>Lưu ý: Hệ số giá sẽ được áp dụng vào giá cơ bản của từng loại phòng chiếu để tính giá vé cuối cùng.</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Giá vé theo nhóm khách hàng -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Giá vé theo nhóm khách hàng</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered price-table" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Nhóm khách hàng</th>
+                                    <th>Hệ số giá</th>
+                                    <th>Mô tả</th>
+                                    <th>Áp dụng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Người lớn (18+ tuổi)</td>
+                                    <td>1.0</td>
+                                    <td>Giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editCustomerFactorModal" data-customer-type="ADULT">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Học sinh, sinh viên</td>
+                                    <td>0.8</td>
+                                    <td>Giảm 20% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editCustomerFactorModal" data-customer-type="STUDENT">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Trẻ em (dưới 12 tuổi)</td>
+                                    <td>0.6</td>
+                                    <td>Giảm 40% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editCustomerFactorModal" data-customer-type="CHILD">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Người cao tuổi (60+ tuổi)</td>
+                                    <td>0.7</td>
+                                    <td>Giảm 30% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editCustomerFactorModal" data-customer-type="SENIOR">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Thành viên VIP</td>
+                                    <td>0.85</td>
+                                    <td>Giảm 15% giá cơ bản</td>
+                                    <td><span class="badge bg-success">Đang áp dụng</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#editCustomerFactorModal" data-customer-type="VIP">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quy tắc tính giá -->
+        <div class="tab-pane fade" id="pricing-rules" role="tabpanel" aria-labelledby="pricing-rules-tab">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quy tắc áp dụng giá vé</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i> Cách tính giá vé</h5>
+                        <p>Hệ thống sẽ tính giá vé theo công thức sau:</p>
+                        <div class="bg-light p-3 rounded mb-3">
+                            <code>Giá vé = Giá cơ bản của loại phòng × Hệ số thời gian × Hệ số nhóm khách hàng × (1 - Khuyến mãi)</code>
+                        </div>
+                        <p>Trong đó:</p>
+                        <ul>
+                            <li><strong>Giá cơ bản của loại phòng:</strong> Giá tiền chuẩn cho từng loại phòng chiếu (Standard, Premium, VIP).</li>
+                            <li><strong>Hệ số thời gian:</strong> Phụ thuộc vào khung giờ và ngày chiếu (sáng, trưa, tối, cuối tuần, ngày lễ).</li>
+                            <li><strong>Hệ số nhóm khách hàng:</strong> Phụ thuộc vào đối tượng khách hàng (người lớn, sinh viên, trẻ em, người cao tuổi, thành viên VIP).</li>
+                            <li><strong>Khuyến mãi:</strong> Giảm giá từ các chương trình khuyến mãi đặc biệt (nếu có).</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Ví dụ tính giá:</h5>
+                        <ol>
+                            <li>Người lớn xem phim tại phòng Standard vào buổi tối thứ Bảy:
+                                <div class="bg-light p-2 rounded my-2">
+                                    <strong>90.000đ × 1.0 (tối) × 1.2 (cuối tuần) × 1.0 (người lớn) = 108.000đ</strong>
+                                </div>
+                            </li>
+                            <li>Sinh viên xem phim tại phòng Premium vào buổi sáng ngày thường:
+                                <div class="bg-light p-2 rounded my-2">
+                                    <strong>120.000đ × 0.8 (sáng) × 1.0 (ngày thường) × 0.8 (sinh viên) = 76.800đ</strong>
+                                </div>
+                            </li>
+                            <li>Trẻ em xem phim tại phòng VIP vào buổi trưa ngày lễ:
+                                <div class="bg-light p-2 rounded my-2">
+                                    <strong>180.000đ × 0.9 (trưa) × 1.3 (ngày lễ) × 0.6 (trẻ em) = 126.360đ</strong>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Quy tắc ưu tiên</h5>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editRuleModal">
+                                <i class="fas fa-edit me-1"></i> Chỉnh sửa quy tắc
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Thứ tự ưu tiên</th>
+                                        <th>Quy tắc</th>
+                                        <th>Mô tả</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Khuyến mãi đặc biệt</td>
+                                        <td>Các chương trình khuyến mãi đặc biệt có mức ưu tiên cao nhất</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Giá theo nhóm khách hàng</td>
+                                        <td>Áp dụng giảm giá theo đối tượng (trẻ em, sinh viên,...)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Hệ số thời gian</td>
+                                        <td>Áp dụng tăng/giảm giá theo khung giờ và ngày chiếu</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Giá cơ bản loại phòng</td>
+                                        <td>Giá cơ sở của từng loại phòng chiếu</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-check form-switch mt-3">
+                            <input class="form-check-input" type="checkbox" id="roundingSwitch" checked>
+                            <label class="form-check-label" for="roundingSwitch">Làm tròn giá vé đến 1.000đ gần nhất</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal thêm cấu hình giá -->
+    <div class="modal fade" id="addPriceModal" tabindex="-1" aria-labelledby="addPriceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPriceModalLabel">Thêm cấu hình giá mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/create}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="addPriceType" class="form-label">Loại cấu hình giá</label>
+                            <select class="form-select" id="addPriceType" name="priceType" required>
+                                <option value="">Chọn loại cấu hình giá</option>
+                                <option value="SCREEN_TYPE">Giá theo loại phòng</option>
+                                <option value="TIME_FACTOR">Hệ số theo thời gian</option>
+                                <option value="CUSTOMER_FACTOR">Hệ số theo nhóm khách hàng</option>
+                            </select>
+                        </div>
+                        
+                        <div id="screenTypeFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="addScreenType" class="form-label">Loại phòng chiếu</label>
+                                <select class="form-select" id="addScreenType" name="screenType">
+                                    <option value="STANDARD">Standard - Tiêu chuẩn (2D)</option>
+                                    <option value="PREMIUM">Premium - Cao cấp (3D)</option>
+                                    <option value="VIP">VIP - IMAX</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="addScreenPrice" class="form-label">Giá cơ bản (VND)</label>
+                                <input type="number" class="form-control" id="addScreenPrice" name="basePrice" min="1000" step="1000">
+                            </div>
+                        </div>
+                        
+                        <div id="timeFactorFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="addTimeSlot" class="form-label">Khung giờ</label>
+                                <select class="form-select" id="addTimeSlot" name="timeSlot">
+                                    <option value="MORNING">Sáng (08:00 - 12:00)</option>
+                                    <option value="AFTERNOON">Trưa (12:00 - 17:00)</option>
+                                    <option value="EVENING">Tối (17:00 - 22:00)</option>
+                                    <option value="WEEKEND">Cuối tuần (Thứ 7, Chủ nhật)</option>
+                                    <option value="HOLIDAY">Ngày lễ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="addTimeFactor" class="form-label">Hệ số giá</label>
+                                <input type="number" class="form-control" id="addTimeFactor" name="priceFactor" min="0.1" max="2" step="0.05" value="1.0">
+                            </div>
+                        </div>
+                        
+                        <div id="customerFactorFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="addCustomerType" class="form-label">Nhóm khách hàng</label>
+                                <select class="form-select" id="addCustomerType" name="customerType">
+                                    <option value="ADULT">Người lớn (18+ tuổi)</option>
+                                    <option value="STUDENT">Học sinh, sinh viên</option>
+                                    <option value="CHILD">Trẻ em (dưới 12 tuổi)</option>
+                                    <option value="SENIOR">Người cao tuổi (60+ tuổi)</option>
+                                    <option value="VIP">Thành viên VIP</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="addCustomerFactor" class="form-label">Hệ số giá</label>
+                                <input type="number" class="form-control" id="addCustomerFactor" name="priceFactor" min="0.1" max="1" step="0.05" value="1.0">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="addDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="addDescription" name="description" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="addActive" name="active" checked>
+                            <label class="form-check-label" for="addActive">Áp dụng ngay</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu cấu hình giá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa giá theo loại phòng -->
+    <div class="modal fade" id="editPriceModal" tabindex="-1" aria-labelledby="editPriceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPriceModalLabel">Cập nhật giá phòng <span id="editScreenTypeLabel"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/update}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editPriceId" name="id">
+                        <input type="hidden" id="editScreenType" name="screenType">
+                        
+                        <div class="mb-3">
+                            <label for="editBasePrice" class="form-label">Giá cơ bản (VND)</label>
+                            <input type="number" class="form-control" id="editBasePrice" name="basePrice" min="1000" step="1000" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editPriceDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editPriceDescription" name="description" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editPriceActive" name="active" checked>
+                            <label class="form-check-label" for="editPriceActive">Áp dụng ngay</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa hệ số giá theo thời gian -->
+    <div class="modal fade" id="editTimeFactorModal" tabindex="-1" aria-labelledby="editTimeFactorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTimeFactorModalLabel">Cập nhật hệ số giá theo thời gian</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/update-time-factor}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editTimeFactorId" name="id">
+                        <input type="hidden" id="editTimeSlot" name="timeSlot">
+                        
+                        <div class="mb-3">
+                            <label for="editTimeName" class="form-label">Thời gian</label>
+                            <input type="text" class="form-control" id="editTimeName" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editFactor" class="form-label">Hệ số giá</label>
+                            <input type="number" class="form-control" id="editFactor" name="priceFactor" min="0.1" max="2" step="0.05" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editTimeDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editTimeDescription" name="description" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editTimeActive" name="active" checked>
+                            <label class="form-check-label" for="editTimeActive">Áp dụng ngay</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa hệ số giá theo nhóm khách hàng -->
+    <div class="modal fade" id="editCustomerFactorModal" tabindex="-1" aria-labelledby="editCustomerFactorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCustomerFactorModalLabel">Cập nhật hệ số giá theo nhóm khách hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/update-customer-factor}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editCustomerFactorId" name="id">
+                        <input type="hidden" id="editCustomerType" name="customerType">
+                        
+                        <div class="mb-3">
+                            <label for="editCustomerName" class="form-label">Nhóm khách hàng</label>
+                            <input type="text" class="form-control" id="editCustomerName" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editCustomerFactor" class="form-label">Hệ số giá</label>
+                            <input type="number" class="form-control" id="editCustomerFactor" name="priceFactor" min="0.1" max="1" step="0.05" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editCustomerDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editCustomerDescription" name="description" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editCustomerActive" name="active" checked>
+                            <label class="form-check-label" for="editCustomerActive">Áp dụng ngay</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal chỉnh sửa quy tắc ưu tiên -->
+    <div class="modal fade" id="editRuleModal" tabindex="-1" aria-labelledby="editRuleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRuleModalLabel">Chỉnh sửa quy tắc tính giá</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/pricing/update-rules}" method="post">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Thay đổi quy tắc tính giá có thể ảnh hưởng đến toàn bộ hệ thống. Vui lòng cân nhắc kỹ trước khi thay đổi.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Thứ tự ưu tiên</label>
+                            <div class="list-group" id="priorityList">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-grip-vertical me-2 text-muted"></i>
+                                        <span>Khuyến mãi đặc biệt</span>
+                                    </div>
+                                    <span class="badge bg-primary">1</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-grip-vertical me-2 text-muted"></i>
+                                        <span>Giá theo nhóm khách hàng</span>
+                                    </div>
+                                    <span class="badge bg-primary">2</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-grip-vertical me-2 text-muted"></i>
+                                        <span>Hệ số thời gian</span>
+                                    </div>
+                                    <span class="badge bg-primary">3</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-grip-vertical me-2 text-muted"></i>
+                                        <span>Giá cơ bản loại phòng</span>
+                                    </div>
+                                    <span class="badge bg-primary">4</span>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Kéo và thả để sắp xếp thứ tự ưu tiên</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="roundingRule" name="enableRounding" checked>
+                                <label class="form-check-label" for="roundingRule">Làm tròn giá vé đến 1.000đ gần nhất</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="applyMultiple" name="applyMultipleFactors" checked>
+                                <label class="form-check-label" for="applyMultiple">Áp dụng đồng thời nhiều hệ số</label>
+                            </div>
+                            <small class="form-text text-muted">Nếu tắt, chỉ áp dụng hệ số ưu tiên cao nhất</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý hiển thị các trường trong modal thêm cấu hình giá
+            const priceTypeSelect = document.getElementById('addPriceType');
+            const screenTypeFields = document.getElementById('screenTypeFields');
+            const timeFactorFields = document.getElementById('timeFactorFields');
+            const customerFactorFields = document.getElementById('customerFactorFields');
+            
+            priceTypeSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                
+                screenTypeFields.style.display = 'none';
+                timeFactorFields.style.display = 'none';
+                customerFactorFields.style.display = 'none';
+                
+                if (selectedValue === 'SCREEN_TYPE') {
+                    screenTypeFields.style.display = 'block';
+                } else if (selectedValue === 'TIME_FACTOR') {
+                    timeFactorFields.style.display = 'block';
+                } else if (selectedValue === 'CUSTOMER_FACTOR') {
+                    customerFactorFields.style.display = 'block';
+                }
+            });
+            
+            // Xử lý modal chỉnh sửa giá phòng
+            const editPriceModal = document.getElementById('editPriceModal');
+            editPriceModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const screenType = button.getAttribute('data-screen-type');
+                
+                let screenTypeText = 'Standard';
+                let basePrice = 90000;
+                
+                if (screenType === 'PREMIUM') {
+                    screenTypeText = 'Premium';
+                    basePrice = 120000;
+                } else if (screenType === 'VIP') {
+                    screenTypeText = 'VIP/IMAX';
+                    basePrice = 180000;
+                }
+                
+                document.getElementById('editScreenTypeLabel').textContent = screenTypeText;
+                document.getElementById('editScreenType').value = screenType;
+                document.getElementById('editBasePrice').value = basePrice;
+            });
+            
+            // Xử lý modal chỉnh sửa hệ số thời gian
+            const editTimeFactorModal = document.getElementById('editTimeFactorModal');
+            editTimeFactorModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const timeSlot = button.getAttribute('data-time-slot');
+                
+                let timeSlotText = '';
+                let factor = 1.0;
+                
+                switch(timeSlot) {
+                    case 'MORNING':
+                        timeSlotText = 'Sáng (08:00 - 12:00)';
+                        factor = 0.8;
+                        break;
+                    case 'AFTERNOON':
+                        timeSlotText = 'Trưa (12:00 - 17:00)';
+                        factor = 0.9;
+                        break;
+                    case 'EVENING':
+                        timeSlotText = 'Tối (17:00 - 22:00)';
+                        factor = 1.0;
+                        break;
+                    case 'WEEKEND':
+                        timeSlotText = 'Cuối tuần (Thứ 7, Chủ nhật)';
+                        factor = 1.2;
+                        break;
+                    case 'HOLIDAY':
+                        timeSlotText = 'Ngày lễ';
+                        factor = 1.3;
+                        break;
+                }
+                
+                document.getElementById('editTimeSlot').value = timeSlot;
+                document.getElementById('editTimeName').value = timeSlotText;
+                document.getElementById('editFactor').value = factor;
+            });
+            
+            // Xử lý modal chỉnh sửa hệ số nhóm khách hàng
+            const editCustomerFactorModal = document.getElementById('editCustomerFactorModal');
+            editCustomerFactorModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const customerType = button.getAttribute('data-customer-type');
+                
+                let customerTypeText = '';
+                let factor = 1.0;
+                
+                switch(customerType) {
+                    case 'ADULT':
+                        customerTypeText = 'Người lớn (18+ tuổi)';
+                        factor = 1.0;
+                        break;
+                    case 'STUDENT':
+                        customerTypeText = 'Học sinh, sinh viên';
+                        factor = 0.8;
+                        break;
+                    case 'CHILD':
+                        customerTypeText = 'Trẻ em (dưới 12 tuổi)';
+                        factor = 0.6;
+                        break;
+                    case 'SENIOR':
+                        customerTypeText = 'Người cao tuổi (60+ tuổi)';
+                        factor = 0.7;
+                        break;
+                    case 'VIP':
+                        customerTypeText = 'Thành viên VIP';
+                        factor = 0.85;
+                        break;
+                }
+                
+                document.getElementById('editCustomerType').value = customerType;
+                document.getElementById('editCustomerName').value = customerTypeText;
+                document.getElementById('editCustomerFactor').value = factor;
+            });
+            
+            // Khởi tạo Sortable.js cho danh sách quy tắc ưu tiên
+            const priorityList = document.getElementById('priorityList');
+            if (priorityList) {
+                new Sortable(priorityList, {
+                    animation: 150,
+                    ghostClass: 'bg-light',
+                    handle: '.fas.fa-grip-vertical',
+                    onEnd: function() {
+                        // Cập nhật lại số thứ tự
+                        const items = priorityList.querySelectorAll('.list-group-item');
+                        items.forEach((item, index) => {
+                            item.querySelector('.badge').textContent = index + 1;
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

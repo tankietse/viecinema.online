@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Tổng quan hệ thống</h1>
+            <p class="text-muted">Xem nhanh các thống kê và số liệu quan trọng</p>
+        </div>
+    </div>
+
+    <!-- Thẻ thống kê -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Doanh thu (Tháng hiện tại)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${#numbers.formatDecimal(currentMonthRevenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">3,500,000 ₫</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Doanh thu (Năm hiện tại)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${#numbers.formatDecimal(yearlyRevenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">215,000,000 ₫</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Tỷ lệ đặt vé</div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800" th:text="${bookingRate} + '%'">78%</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar" th:style="'width: ' + ${bookingRate} + '%'" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Đơn đặt vé chưa xử lý</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${pendingBookings}">18</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo tháng</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Lựa chọn:</div>
+                            <a class="dropdown-item" href="#">Xuất báo cáo</a>
+                            <a class="dropdown-item" href="#">Chi tiết</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Xem tất cả</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ phân bổ -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Phân bổ doanh thu</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink2">
+                            <div class="dropdown-header">Lựa chọn:</div>
+                            <a class="dropdown-item" href="#">Xuất báo cáo</a>
+                            <a class="dropdown-item" href="#">Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Vé xem phim
+                        </span>
+                        <span class="mx-2">
+                            <i class="fas fa-circle text-success"></i> Đồ ăn & thức uống
+                        </span>
+                        <span class="ml-2">
+                            <i class="fas fa-circle text-info"></i> Khác
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng nội dung -->
+    <div class="row">
+        <!-- Phim thịnh hành -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Phim thịnh hành</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="trendingMoviesTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Tên phim</th>
+                                    <th>Vé bán</th>
+                                    <th>Doanh thu</th>
+                                    <th>Đánh giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="movie : ${trendingMovies}">
+                                    <td th:text="${movie.title}">Đất rừng phương Nam</td>
+                                    <td th:text="${movie.ticketsSold}">789</td>
+                                    <td th:text="${#numbers.formatDecimal(movie.revenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">78,900,000 ₫</td>
+                                    <td>
+                                        <div class="small-ratings">
+                                            <span th:each="i : ${#numbers.sequence(1, movie.rating)}">
+                                                <i class="fas fa-star text-warning"></i>
+                                            </span>
+                                            <span th:each="i : ${#numbers.sequence(movie.rating + 1, 5)}">
+                                                <i class="far fa-star text-warning"></i>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hoạt động gần đây -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hoạt động gần đây</h6>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed">
+                        <div class="feed-item" th:each="activity : ${recentActivities}">
+                            <div class="date" th:text="${activity.timestamp}">5 phút trước</div>
+                            <div class="feed-content">
+                                <p th:text="${activity.description}">Người dùng <strong>Nguyễn Văn A</strong> đã đặt vé xem phim <strong>Đất rừng phương Nam</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Dữ liệu biểu đồ doanh thu
+        var revenueData = {
+            labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+            datasets: [{
+                label: "Doanh thu",
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "rgba(78, 115, 223, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: [10000000, 15000000, 20000000, 25000000, 30000000, 35000000, 25000000, 20000000, 30000000, 35000000, 25000000, 40000000],
+            }],
+        };
+
+        // Dữ liệu biểu đồ phân bổ
+        var distributionData = {
+            labels: ["Vé xem phim", "Đồ ăn & thức uống", "Khác"],
+            datasets: [{
+                data: [70, 25, 5],
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        };
+
+        // Cấu hình biểu đồ doanh thu
+        var revenueChartConfig = {
+            type: 'line',
+            data: revenueData,
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'date'
+                        },
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            callback: function(value) {
+                                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+                            }
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
+                    callbacks: {
+                        label: function(tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': ' + tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫";
+                        }
+                    }
+                }
+            }
+        };
+
+        // Cấu hình biểu đồ phân bổ
+        var distributionChartConfig = {
+            type: 'doughnut',
+            data: distributionData,
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                },
+                legend: {
+                    display: false
+                },
+                cutoutPercentage: 80,
+            },
+        };
+
+        // Khởi tạo biểu đồ khi trang đã tải
+        window.addEventListener('DOMContentLoaded', function() {
+            // Biểu đồ doanh thu
+            var revenueCtx = document.getElementById("revenueChart");
+            if (revenueCtx) {
+                new Chart(revenueCtx, revenueChartConfig);
+            }
+            
+            // Biểu đồ phân bổ
+            var distributionCtx = document.getElementById("distributionChart");
+            if (distributionCtx) {
+                new Chart(distributionCtx, distributionChartConfig);
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

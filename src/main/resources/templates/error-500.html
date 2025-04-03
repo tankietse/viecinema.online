@@ -5,16 +5,308 @@
 <head>
     <meta charset="UTF-8">
     <title>500 - Internal Server Error</title>
+    <style>
+        .error-container {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-code {
+            font-size: 160px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff5252, #ff7b7b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0;
+            line-height: 1;
+            position: relative;
+            text-shadow: 0 5px 15px rgba(255, 82, 82, 0.4);
+        }
+        
+        .error-code::before {
+            content: "500";
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            color: rgba(255, 82, 82, 0.1);
+            transform: translate(5px, 5px);
+        }
+        
+        .error-title {
+            font-size: 36px;
+            color: #333;
+            margin: 20px 0;
+        }
+        
+        .error-message {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        
+        .error-details {
+            background-color: rgba(255, 230, 230, 0.3);
+            border-left: 4px solid #ff5252;
+            padding: 15px 20px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            text-align: left;
+            border-radius: 5px;
+        }
+        
+        .error-details pre {
+            margin: 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .action-button {
+            background: linear-gradient(45deg, #ff5252, #ff7b7b);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 82, 82, 0.3);
+        }
+        
+        .action-button.secondary {
+            background: transparent;
+            border: 2px solid #ff5252;
+            color: #ff5252;
+        }
+        
+        .action-button.secondary:hover {
+            background: rgba(255, 82, 82, 0.1);
+        }
+        
+        .error-image {
+            max-width: 320px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: shake 4s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            20% {
+                transform: rotate(8deg);
+            }
+            40% {
+                transform: rotate(-8deg);
+            }
+            60% {
+                transform: rotate(4deg);
+            }
+            80% {
+                transform: rotate(-4deg);
+            }
+        }
+        
+        .gear {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: rotate 10s linear infinite;
+        }
+        
+        .gear.gear-1 {
+            top: -30px;
+            right: -50px;
+            animation-direction: reverse;
+            animation-duration: 15s;
+        }
+        
+        .gear.gear-2 {
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .gear.gear-3 {
+            top: 40%;
+            right: -80px;
+            width: 120px;
+            height: 120px;
+            animation-duration: 7s;
+        }
+        
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .error-info {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .error-info .details-toggle {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            user-select: none;
+        }
+        
+        .error-info .details-toggle i {
+            transition: transform 0.3s;
+        }
+        
+        .error-info .details-toggle.open i {
+            transform: rotate(180deg);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 120px;
+            }
+            
+            .error-title {
+                font-size: 28px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+            }
+            
+            .error-image {
+                max-width: 250px;
+            }
+            
+            .gear {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .gear.gear-1 {
+                top: -20px;
+                right: -30px;
+            }
+            
+            .gear.gear-2 {
+                bottom: -30px;
+                left: -30px;
+                width: 150px;
+                height: 150px;
+            }
+            
+            .gear.gear-3 {
+                display: none;
+            }
+        }
+    </style>
 </head>
+
 <body>
 <section layout:fragment="content">
-    <div class="container text-center">
-        <div class="jumbotron mt-5">
-            <h1 class="display-4">500 - Internal Server Error</h1>
-            <p class="lead">Xin lỗi, có lỗi xảy ra trên máy chủ của chúng tôi.</p>
-            <a href="javascript:history.back()" class="btn btn-primary btn-lg">Quay lại</a>
+    <div class="error-container">
+        <!-- Gear decoration -->
+        <svg class="gear gear-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#ff5252" d="M50,10 L53,18 L60,15 L58,23 L65,25 L60,30 L65,35 L58,37 L60,45 L53,42 L50,50 L47,42 L40,45 L42,37 L35,35 L40,30 L35,25 L42,23 L40,15 L47,18 Z" />
+            <circle cx="50" cy="30" r="12" fill="#fff" />
+        </svg>
+        <svg class="gear gear-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#ff5252" d="M50,10 L53,18 L60,15 L58,23 L65,25 L60,30 L65,35 L58,37 L60,45 L53,42 L50,50 L47,42 L40,45 L42,37 L35,35 L40,30 L35,25 L42,23 L40,15 L47,18 Z" />
+            <circle cx="50" cy="30" r="12" fill="#fff" />
+        </svg>
+        <svg class="gear gear-3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#ff5252" d="M50,10 L53,18 L60,15 L58,23 L65,25 L60,30 L65,35 L58,37 L60,45 L53,42 L50,50 L47,42 L40,45 L42,37 L35,35 L40,30 L35,25 L42,23 L40,15 L47,18 Z" />
+            <circle cx="50" cy="30" r="12" fill="#fff" />
+        </svg>
+        
+        <img class="error-image" th:src="@{/static/img/500.svg}" alt="Server Error" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6195/6195678.png'">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">Lỗi máy chủ nội bộ</h2>
+        <p class="error-message">
+            Rất tiếc, đã xảy ra lỗi ở phía máy chủ. Đội ngũ kỹ thuật của chúng tôi đã được thông báo về 
+            vấn đề này và đang cố gắng khắc phục nhanh nhất có thể. Vui lòng thử lại sau ít phút.
+        </p>
+        
+        <div class="error-info">
+            <div th:if="${error}" id="errorDetails" style="display: none;">
+                <div class="error-details">
+                    <strong>Error:</strong> <span th:text="${error}"></span><br>
+                    <strong>Status:</strong> <span th:text="${status}"></span><br>
+                    <strong>Message:</strong> <span th:text="${message}"></span><br>
+                    <th:block th:if="${trace}">
+                        <strong>Stack trace:</strong>
+                        <pre th:text="${trace}"></pre>
+                    </th:block>
+                </div>
+            </div>
+            
+            <div class="details-toggle" onclick="toggleErrorDetails()">
+                <span id="detailsText">Hiển thị chi tiết lỗi</span>
+                <i id="detailsIcon" class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="javascript:window.location.reload()" class="action-button">
+                <i class="fas fa-sync-alt"></i> Tải lại trang
+            </a>
+            <a th:href="@{/home}" class="action-button secondary">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
         </div>
     </div>
+    
+    <script>
+        function toggleErrorDetails() {
+            const details = document.getElementById('errorDetails');
+            const detailsText = document.getElementById('detailsText');
+            const detailsIcon = document.getElementById('detailsIcon');
+            const detailsToggle = document.querySelector('.details-toggle');
+            
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                detailsText.innerText = 'Ẩn chi tiết lỗi';
+                detailsToggle.classList.add('open');
+            } else {
+                details.style.display = 'none';
+                detailsText.innerText = 'Hiển thị chi tiết lỗi';
+                detailsToggle.classList.remove('open');
+            }
+        }
+    </script>
 </section>
 </body>
 </html>

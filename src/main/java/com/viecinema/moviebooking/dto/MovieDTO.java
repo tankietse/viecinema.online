@@ -8,8 +8,8 @@ import lombok.Data;
 
 @Data
 public class MovieDTO {
-    private int id;
-    private int tmdbID;
+    private Long id;
+    private Long tmdbID;
     private String title;
     private String overview;
     private String posterPath;

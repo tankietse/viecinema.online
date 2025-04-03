@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class MovieGenreId implements Serializable {
     @Column(name = "movie_id")
-    private Integer movieId;
+    private Long movieId;
 
     @Column(name = "genre_id")
     private Integer genreId;

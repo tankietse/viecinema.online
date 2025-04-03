@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vie Cinema: Chi tiết đặt vé</title>
+    <link rel="icon" type="image/svg" th:href="@{/static/img/Vie.svg}" />
+    <style>
+        .booking-details-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .booking-header {
+            background-color: #ff7b00;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .booking-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .booking-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .status-completed {
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        
+        .status-upcoming {
+            background-color: #e6f0ff;
+            color: #007bff;
+        }
+        
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+        
+        .booking-body {
+            padding: 20px;
+        }
+        
+        .booking-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .movie-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .movie-poster {
+            width: 120px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        .movie-details h3 {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            color: #ff7b00;
+        }
+        
+        .movie-meta {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            flex: 0 0 180px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .qr-section {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px auto;
+        }
+        
+        .qr-note {
+            font-size: 14px;
+            color: #666;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 15px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .back-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .cancel-btn {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #ffd5d9;
+        }
+        
+        .download-btn {
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        
+        .download-btn:hover {
+            background-color: #d4f3d4;
+        }
+        
+        .payment-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .booking-details-container {
+                margin: 20px 10px;
+            }
+            
+            .movie-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            
+            .detail-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include layout -->
+    <section layout:fragment="content">
+        <div class="main-container custom-scrollbar">
+            <div class="booking-details-container">
+                <div class="booking-header">
+                    <h1 class="booking-title">Chi tiết đặt vé #<span th:text="${booking.bookingCode}">VIE-12345</span></h1>
+                    <div class="booking-status" 
+                         th:classappend="${booking.status == 'COMPLETED' ? 'status-completed' : (booking.status == 'UPCOMING' ? 'status-upcoming' : 'status-cancelled')}"
+                         th:text="${booking.status == 'COMPLETED' ? 'Đã hoàn thành' : (booking.status == 'UPCOMING' ? 'Sắp tới' : 'Đã hủy')}">
+                        Sắp tới
+                    </div>
+                </div>
+                
+                <div class="booking-body">
+                    <!-- Movie Information -->
+                    <div class="booking-section">
+                        <h2 class="section-title">Thông tin phim</h2>
+                        <div class="movie-info">
+                            <img class="movie-poster lazyload" 
+                                 th:data-src="'https://image.tmdb.org/t/p/w500' + ${booking.movie.posterPath}" 
+                                 th:src="@{/static/img/placeholder.png}" 
+                                 th:alt="${booking.movie.title}">
+                            <div class="movie-details">
+                                <h3 th:text="${booking.movie.title}">Tên phim</h3>
+                                <p class="movie-meta"><span th:text="${#strings.listJoin(booking.movie.genres, ', ')}">Thể loại</span> | <span th:text="${booking.movie.runtimeMinutes + ' phút'}">120 phút</span></p>
+                                <p class="movie-meta" th:text="${booking.movie.overview}">Mô tả phim ngắn gọn...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Showtime Information -->
+                    <div class="booking-section">
+                        <h2 class="section-title">Thông tin suất chiếu</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">Rạp:</div>
+                            <div class="detail-value" th:text="${booking.theater.name}">Vie Cinema Quận 1</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Địa chỉ:</div>
+                            <div class="detail-value" th:text="${booking.theater.address}">123 Nguyễn Huệ, Quận 1, TP.HCM</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Phòng chiếu:</div>
+                            <div class="detail-value" th:text="${booking.room}">Phòng 3</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Ngày chiếu:</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.showTime, 'dd/MM/yyyy')}">20/12/2023</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Giờ chiếu:</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.showTime, 'HH:mm')}">20:30</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Ghế:</div>
+                            <div class="detail-value" th:text="${booking.seats}">A1, A2</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Information -->
+                    <div class="booking-section">
+                        <h2 class="section-title">Thông tin thanh toán</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">Phương thức thanh toán:</div>
+                            <div class="detail-value" th:text="${booking.paymentMethod}">Thẻ tín dụng</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Ngày thanh toán:</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.paymentTime, 'dd/MM/yyyy HH:mm')}">18/12/2023 15:45</div>
+                        </div>
+                        <div class="payment-info">
+                            <div class="detail-row">
+                                <div class="detail-label">Giá vé:</div>
+                                <div class="detail-value" th:text="${#numbers.formatDecimal(booking.ticketPrice, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">90,000 VNĐ x 2</div>
+                            </div>
+                            <div th:if="${booking.concessions != null && !booking.concessions.isEmpty()}" class="detail-row">
+                                <div class="detail-label">Đồ ăn & thức uống:</div>
+                                <div class="detail-value" th:text="${#numbers.formatDecimal(booking.concessionsPrice, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">50,000 VNĐ</div>
+                            </div>
+                            <div th:if="${booking.discountAmount > 0}" class="detail-row">
+                                <div class="detail-label">Khuyến mãi:</div>
+                                <div class="detail-value" th:text="'-' + ${#numbers.formatDecimal(booking.discountAmount, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">-30,000 VNĐ</div>
+                            </div>
+                            <div class="detail-row total-row">
+                                <div class="detail-label">Tổng thanh toán:</div>
+                                <div class="detail-value" th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">180,000 VNĐ</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code -->
+                    <div th:if="${booking.status != 'CANCELLED'}" class="qr-section">
+                        <img class="qr-code" th:src="${booking.qrCodeUrl}" alt="QR Code">
+                        <p class="qr-note">Vui lòng xuất trình mã QR này tại rạp để vào phòng chiếu. Mã QR chỉ có hiệu lực cho suất chiếu này và không thể sử dụng lại.</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a th:href="@{/booking-history}" class="action-btn back-btn">Quay lại</a>
+                        <a th:if="${booking.status == 'UPCOMING'}" th:href="@{/cancel-booking(id=${booking.id})}" class="action-btn cancel-btn">Hủy vé</a>
+                        <a th:if="${booking.status != 'CANCELLED'}" th:href="@{/download-ticket(id=${booking.id})}" class="action-btn download-btn">Tải vé PDF</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_admin_layout}">
+<head>
+    <title>Vie Cinema - Phòng chiếu</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="header-action">
+        <h1 class="h3 mb-2 text-gray-800">Phòng chiếu - <span th:text="${theater.theaterName}"></span></h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScreenModal">
+            <i class="fas fa-plus mr-1"></i> Thêm phòng chiếu mới
+        </button>
+    </div>
+    
+    <p class="mb-4">
+        Quản lý thông tin các phòng chiếu của rạp <strong th:text="${theater.theaterName}"></strong>. 
+        Địa chỉ: <span th:text="${theater.address}"></span>, <span th:text="${theater.city}"></span>
+    </p>
+    
+    <div class="mb-3">
+        <a th:href="@{/admin/theaters}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách rạp
+        </a>
+    </div>
+
+    <!-- Thông báo -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công!</strong> <span th:text="${success}">Thao tác đã được thực hiện thành công.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi!</strong> <span th:text="${error}">Đã có lỗi xảy ra, vui lòng thử lại.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bảng phòng chiếu -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Danh sách phòng chiếu</h6>
+                <div>
+                    <input type="text" id="screenSearch" class="form-control form-control-sm" placeholder="Tìm kiếm...">
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="screensTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên phòng</th>
+                            <th>Loại phòng</th>
+                            <th>Sức chứa</th>
+                            <th>Số hàng ghế</th>
+                            <th>Số ghế mỗi hàng</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="screen : ${screens}">
+                            <td th:text="${screen.screenId}"></td>
+                            <td th:text="${screen.screenName}"></td>
+                            <td th:text="${screen.screenType.typeName}"></td>
+                            <td th:text="${screen.capacity}"></td>
+                            <td th:text="${screen.seat.rowNumber}"></td>
+                            <td th:text="${screen.seat.seatNumber}"></td>
+                            <td>
+                                <button class="btn btn-sm btn-info mr-1" data-bs-toggle="modal" data-bs-target="#editScreenModal"
+                                        th:attr="data-id=${screen.screenId}, data-name=${screen.screenName}, 
+                                                data-screen-type=${screen.screenType.screenTypeId}, 
+                                                data-capacity=${screen.capacity}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" th:onclick="'deleteScreen(this)'" th:attr="data-id=${screen.screenId}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <a th:href="@{/admin/screens/{id}/seats(id=${screen.screenId})}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-chair"></i> Sơ đồ ghế
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(screens)}">
+                            <td colspan="7" class="text-center">Không có phòng chiếu nào</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal thêm phòng chiếu -->
+    <div class="modal fade" id="addScreenModal" tabindex="-1" aria-labelledby="addScreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addScreenModalLabel">Thêm phòng chiếu mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/theaters/{id}/screens/create(id=${theater.theaterId})}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="screenName" class="form-label">Tên phòng chiếu</label>
+                            <input type="text" class="form-control" id="screenName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="screenType" class="form-label">Loại phòng</label>
+                            <select class="form-control" id="screenType" name="screenType.screenTypeId" required>
+                                <option value="">-- Chọn loại phòng --</option>
+                                <option th:each="type : ${screenTypes}" th:value="${type.screenTypeId}" th:text="${type.typeName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="capacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="capacity" name="capacity" required min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rowNumber" class="form-label">Số hàng ghế</label>
+                            <input type="number" class="form-control" id="rowNumber" name="seat.rowNumber" required min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="seatNumber" class="form-label">Số ghế mỗi hàng</label>
+                            <input type="number" class="form-control" id="seatNumber" name="seat.seatNumber" required min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="seatType" class="form-label">Loại ghế</label>
+                            <select class="form-control" id="seatType" name="seat.seatType.id" required>
+                                <option value="">-- Chọn loại ghế --</option>
+                                <option th:each="type : ${seatTypes}" th:value="${type.id}" th:text="${type.typeName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Thêm phòng chiếu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal sửa phòng chiếu -->
+    <div class="modal fade" id="editScreenModal" tabindex="-1" aria-labelledby="editScreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editScreenModalLabel">Sửa thông tin phòng chiếu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/screens/update}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="editScreenId" name="id">
+                        <input type="hidden" name="theater.theaterId" th:value="${theater.theaterId}">
+                        <div class="mb-3">
+                            <label for="editScreenName" class="form-label">Tên phòng chiếu</label>
+                            <input type="text" class="form-control" id="editScreenName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editScreenType" class="form-label">Loại phòng</label>
+                            <select class="form-control" id="editScreenType" name="screenType.screenTypeId" required>
+                                <option value="">-- Chọn loại phòng --</option>
+                                <option th:each="type : ${screenTypes}" th:value="${type.screenTypeId}" th:text="${type.typeName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCapacity" class="form-label">Sức chứa</label>
+                            <input type="number" class="form-control" id="editCapacity" name="capacity" required min="1">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Script tìm kiếm trong bảng
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('screenSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    const searchValue = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#screensTable tbody tr');
+                    
+                    rows.forEach(row => {
+                        let found = false;
+                        row.querySelectorAll('td').forEach(cell => {
+                            if (cell.textContent.toLowerCase().indexOf(searchValue) > -1) {
+                                found = true;
+                            }
+                        });
+                        
+                        if (found) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Populate edit modal
+            $('#editScreenModal').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                const id = button.data('id');
+                const name = button.data('name');
+                const screenType = button.data('screen-type');
+                const capacity = button.data('capacity');
+                
+                const modal = $(this);
+                modal.find('#editScreenId').val(id);
+                modal.find('#editScreenName').val(name);
+                modal.find('#editScreenType').val(screenType);
+                modal.find('#editCapacity').val(capacity);
+            });
+        });
+
+        function deleteScreen(button) {
+            const id = button.getAttribute('data-id');
+            if (confirm('Bạn có chắc chắn muốn xóa phòng chiếu này không? Mọi dữ liệu liên quan cũng sẽ bị xóa.')) {
+                // Sử dụng fetch API để gửi yêu cầu xóa
+                fetch(`/admin/screens/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Nếu xóa thành công, reload trang
+                        window.location.reload();
+                    } else {
+                        // Xử lý lỗi
+                        alert('Có lỗi xảy ra khi xóa phòng chiếu. Vui lòng thử lại.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa phòng chiếu. Vui lòng thử lại.');
+                });
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

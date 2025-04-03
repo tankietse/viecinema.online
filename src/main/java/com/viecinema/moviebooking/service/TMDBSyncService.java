@@ -10,11 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class TMDBSyncService {
@@ -26,12 +22,7 @@ public class TMDBSyncService {
     private final TMDBApiClient tmdbApiClient;
     @Autowired
     private TrailerRepository trailerRepository;
-    @Autowired
-    private PersonRepository personRepository;
-    @Autowired
-    private GenreRepository genreRepository;
 
-    @Autowired
     public TMDBSyncService(MovieRepository movieRepository,
                            MovieDynamicDataRepository movieDynamicDataRepository,
                            TMDBApiClient tmdbApiClient, TrailerRepository trailerRepository) {
@@ -44,15 +35,20 @@ public class TMDBSyncService {
     @Scheduled(cron = "0 0 0 * * ?") // Chạy hàng ngày lúc 0 giờ sáng
     public void syncPopularMovies() {
         for (int page = 1; page <= 30; page++) {
-            List<MovieDTO> popularMovies = tmdbApiClient.getPopularMovies(page);
-            for (MovieDTO movieDTO : popularMovies) {
+            // Gett all movies from TMDB
+            // List<MovieDTO> movies = tmdbApiClient.getPopularMovies(page);
+            List<MovieDTO> movies = tmdbApiClient.getNowPlayingMovies();
+            // List<MovieDTO> movies = tmdbApiClient.getUpcomingMovies();
+            // List<MovieDTO> movies = tmdbApiClient.getTopRatedMovies();
+
+            for (MovieDTO movieDTO : movies) {
                 updateOrInsertMovie(movieDTO.getId());
             }
         }
         System.out.println("Sync completed !!");
     }
 
-    private void updateOrInsertMovie(int tmdbId) {
+    private void updateOrInsertMovie(Long tmdbId) {
         MovieDTO movieDTO = tmdbApiClient.getMovieDetails(tmdbId);
 
         Movie movie = movieRepository.findByTmdbID(tmdbId)

@@ -36,6 +36,25 @@ public class Booking {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private BookingStatus status;
+    
+    // Helper method to get total amount as double for calculations
+    public double getTotalAmount() {
+        return totalPrice != null ? totalPrice.doubleValue() : 0.0;
+    }
+    
+    // Helper method to get seats (placeholder - implement based on your data model)
+    public String getSeats() {
+        // This should return a formatted string of seats or be replaced with proper implementation
+        return ""; // Placeholder implementation
+    }
+    
+    // Helper fields for compatibility with existing service
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
